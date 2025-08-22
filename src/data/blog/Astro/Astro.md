@@ -15,13 +15,11 @@ AstroPaper is a highly customizable Astro blog theme. With AstroPaper, you can c
 
 ## Table of contents
 
-## 创建Astro-paper项目
+## 01创建Astro-paper项目
 
 > 本博客使用Astro-paper主题搭建。
 
-## 本地运行
-
-### 命令安装Astro-paper主题
+### 1.1命令安装Astro-paper主题
 
 ``` bash
 # pnpm
