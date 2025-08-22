@@ -130,71 +130,7 @@ const structuredData = {
 
     <ClientRouter />
 
-    <script is:inline>
-      const primaryColorScheme = "none"; // "light" | "dark" | "none"
-
-      const getTheme = () => {
-        if (
-          typeof localStorage !== "undefined" &&
-          localStorage.getItem("theme")
-        ) {
-          return localStorage.getItem("theme");
-        }
-        if (primaryColorScheme && primaryColorScheme !== "none") {
-          return primaryColorScheme;
-        }
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          return "dark";
-        }
-        return "light";
-      };
-
-      let themeValue = getTheme();
-
-      function setPreference() {
-        localStorage.setItem("theme", themeValue);
-        reflectPreference();
-      }
-
-      function reflectPreference() {
-        document.firstElementChild?.setAttribute("data-theme", themeValue);
-
-        const themeBtn = document.querySelector("#theme-btn");
-        if (themeBtn) {
-          themeBtn.setAttribute("aria-label", themeValue);
-        }
-      }
-
-      // Set theme on initial load
-      reflectPreference();
-
-      // Set theme when page loads
-      window.addEventListener("load", () => {
-        const themeBtn = document.querySelector("#theme-btn");
-        if (themeBtn) {
-          themeBtn.addEventListener("click", () => {
-            themeValue = themeValue === "light" ? "dark" : "light";
-            setPreference();
-          });
-        }
-
-        // Reflect preference after setting up event listener
-        reflectPreference();
-      });
-
-      // Handle theme switching for Astro view transitions
-      document.addEventListener("astro:after-swap", () => {
-        reflectPreference();
-
-        const themeBtn = document.querySelector("#theme-btn");
-        if (themeBtn) {
-          themeBtn.addEventListener("click", () => {
-            themeValue = themeValue === "light" ? "dark" : "light";
-            setPreference();
-          });
-        }
-      });
-    </script>
+    <script is:inline src="/toggle-theme.js"></script>
   </head>
   <body>
     <slot />
