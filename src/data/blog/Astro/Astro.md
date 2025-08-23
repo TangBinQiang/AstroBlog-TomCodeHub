@@ -671,72 +671,483 @@ const nextPost =
 
 #### 3.2.2 修改PostDetails.astro
 > 直接复制文件，覆盖PostDetails.astro即可。
-``` yml file=./src/layouts/PostDetails.astro
-# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
-#
-name: Deploy VitePress site to Pages
+``` astro file=./src/layouts/PostDetails.astro
+---
+import { render, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Tag from "@/components/Tag.astro";
+import Datetime from "@/components/Datetime.astro";
+import EditPost from "@/components/EditPost.astro";
+import ShareLinks from "@/components/ShareLinks.astro";
+import BackButton from "@/components/BackButton.astro";
+import BackToTopButton from "@/components/BackToTopButton.astro";
+import { getPath } from "@/utils/getPath";
+import { slugifyStr } from "@/utils/slugify";
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import { SITE } from "@/config";
 
-on:
-  # 在针对 `main` 分支的推送上运行。如果你
-  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
-  push:
-    branches: [main]
+export interface Props {
+  post: CollectionEntry<"blog">;
+  posts: CollectionEntry<"blog">[];
+}
 
-  # 允许你从 Actions 选项卡手动运行此工作流程
-  workflow_dispatch:
+const { post, posts } = Astro.props;
 
-# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+const {
+  title,
+  author,
+  description,
+  ogImage: initOgImage,
+  canonicalURL,
+  pubDatetime,
+  modDatetime,
+  timezone,
+  tags,
+  hideEditPost,
+} = post.data;
 
-# 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列
-# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
-concurrency:
-  group: pages
-  cancel-in-progress: false
+const { Content } = await render(post);
 
-jobs:
-  # 构建工作
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
-      - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消此区域注释
-        with:
-          version: 9
-      # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm # 或 pnpm / yarn
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Install dependencies
-        run: pnpm install # 或 pnpm install / yarn install / bun install
-      - name: Build with VitePress
-        run: pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .vitepress/dist
+let ogImageUrl: string | undefined;
 
-  # 部署工作
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+// Determine OG image source
+if (typeof initOgImage === "string") {
+  ogImageUrl = initOgImage; // Remote OG image (absolute URL)
+} else if (initOgImage?.src) {
+  ogImageUrl = initOgImage.src; // Local asset
+}
+
+// Use dynamic OG image if enabled and no remote|local ogImage
+if (!ogImageUrl && SITE.dynamicOgImage) {
+  ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
+}
+
+// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
+const ogImage = ogImageUrl
+  ? new URL(ogImageUrl, Astro.url.origin).href
+  : undefined;
+
+const layoutProps = {
+  title: `${title} | ${SITE.title}`,
+  author,
+  description,
+  pubDatetime,
+  modDatetime,
+  canonicalURL,
+  ogImage,
+  scrollSmooth: true,
+};
+
+/* ========== Prev/Next Posts ========== */
+
+const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
+  id,
+  title,
+  filePath,
+}));
+
+const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
+
+const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
+const nextPost =
+  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+---
+
+<Layout {...layoutProps}>
+  <Header />
+  <BackButton />
+  <main
+    id="main-content"
+    class:list={[
+      "mx-auto w-full max-w-app px-4 pb-12",
+      { "mt-8": !SITE.showBackButton },
+    ]}
+    data-pagefind-body
+  >
+    <h1
+      transition:name={slugifyStr(title)}
+      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+    >
+      {title}
+    </h1>
+    <div class="my-2 flex items-center gap-2">
+      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span
+        aria-hidden="true"
+        class:list={[
+          "max-sm:hidden",
+          { hidden: !SITE.editPost.enabled || hideEditPost },
+        ]}>|</span
+      >
+      <EditPost {hideEditPost} {post} class="max-sm:hidden" />
+    </div>
+    <div class="post-content-wrapper">
+      <article
+        id="article"
+        class="app-prose mx-auto mt-0 prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+      >
+        <Content />
+      </article>
+      
+      <div class="right-sidebar">
+        <h2>目录</h2>
+        <div id="toc-content"></div>
+      </div>
+    </div>
+
+    <hr class="my-8 border-dashed" />
+
+    <EditPost class="sm:hidden" {hideEditPost} {post} />
+
+    <ul class="mt-4 mb-8 sm:my-8">
+      {tags.map((tag: string) => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+    </ul>
+
+    <BackToTopButton />
+
+    <ShareLinks />
+
+    <hr class="my-6 border-dashed" />
+
+    <!-- Previous/Next Post Buttons -->
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {
+        prevPost && (
+          <a
+            href={getPath(prevPost.id, prevPost.filePath)}
+            class="flex w-full gap-1 hover:opacity-75"
+          >
+            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
+            <div>
+              <span>Previous Post</span>
+              <div class="text-sm text-accent/85">{prevPost.title}</div>
+            </div>
+          </a>
+        )
+      }
+      {
+        nextPost && (
+          <a
+            href={getPath(nextPost.id, nextPost.filePath)}
+            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
+          >
+            <div>
+              <span>Next Post</span>
+              <div class="text-sm text-accent/85">{nextPost.title}</div>
+            </div>
+            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+          </a>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script is:inline data-astro-rerun>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body or any other desired parent element
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    const copyButtonLabel = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      // Check if --file-name-offset custom property exists
+      const computedStyle = getComputedStyle(codeBlock);
+      const hasFileNameOffset =
+        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+
+      // Determine the top positioning class
+      const topClass = hasFileNameOffset
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      const text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /* Go to page start after page swap */
+  document.addEventListener("astro:after-swap", () =>
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+  );
+  
+  // 提取文章中的目录并显示在右侧边栏，支持折叠功能
+  function extractTableOfContents() {
+    const article = document.getElementById("article");
+    const tocContent = document.getElementById("toc-content");
+    
+    if (!article || !tocContent) return;
+    
+    // 清空目录内容，避免重复
+    tocContent.innerHTML = "";
+    
+    // 查找文章中的目录
+    const tocDetails = Array.from(article.querySelectorAll("details")).find(
+      details => {
+        const summary = details.querySelector("summary");
+        return summary && summary.textContent?.trim() === "Table of contents";
+      }
+    );
+    
+    // 先隐藏所有可能的目录元素
+    Array.from(article.querySelectorAll("details")).forEach(details => {
+      const summary = details.querySelector("summary");
+      if (summary && summary.textContent?.trim() === "Table of contents") {
+        details.style.display = "none";
+      }
+    });
+    
+    if (tocDetails) {
+      // 复制目录内容到右侧边栏
+      const tocList = tocDetails.querySelector("ul");
+      if (tocList) {
+        // 处理目录内容，添加折叠功能
+        createCollapsibleToc(tocList, tocContent);
+      }
+    } else {
+      // 如果没有找到目录，则生成一个基于标题的目录
+      const headings = Array.from(article.querySelectorAll("h2, h3, h4")).filter(
+        heading => {
+          const headingText = heading.textContent?.trim() || "";
+          return headingText !== "Table of contents";
+        }
+      );
+      
+      if (headings.length > 0) {
+        // 创建目录并添加折叠功能
+        createTocFromHeadings(headings, tocContent);
+      }
+    }
+  }
+  
+  // 从现有目录创建可折叠目录
+  function createCollapsibleToc(tocList, tocContent) {
+    // 复制目录内容
+    const clonedList = tocList.cloneNode(true);
+    
+    // 移除所有 # 符号
+    Array.from(clonedList.querySelectorAll("a")).forEach(link => {
+      // 移除链接文本中的 # 符号
+      if (link.textContent) {
+        link.textContent = link.textContent.replace(/#/g, "").trim();
+      }
+    });
+    
+    // 处理目录项，添加折叠功能
+    processListItems(clonedList);
+    
+    tocContent.appendChild(clonedList);
+  }
+  
+  // 从标题创建可折叠目录
+  function createTocFromHeadings(headings, tocContent) {
+    const ul = document.createElement("ul");
+    
+    // 跟踪当前的标题级别和父元素
+    let currentLevel = 2; // 从h2开始
+    let currentParent = ul;
+    let parentStack = [ul];
+    
+    headings.forEach(heading => {
+      const headingLevel = parseInt(heading.tagName.charAt(1));
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      
+      // 创建锚点ID（如果没有）
+      if (!heading.id) {
+        heading.id = heading.textContent?.trim().toLowerCase().replace(/\s+/g, "-") || "";
+      }
+      
+      a.href = `#${heading.id}`;
+      
+      // 移除标题文本中的 # 符号
+      if (heading.textContent) {
+        a.textContent = heading.textContent.replace(/#/g, "").trim();
+      } else {
+        a.textContent = "";
+      }
+      
+      li.appendChild(a);
+      
+      // 处理嵌套
+      if (headingLevel > currentLevel) {
+        // 创建新的子列表
+        const newUl = document.createElement("ul");
+        
+        // 添加折叠功能
+        const lastLi = currentParent.lastElementChild;
+        if (lastLi) {
+          lastLi.classList.add("has-children");
+          const toggleBtn = document.createElement("span");
+          toggleBtn.className = "toggle-btn";
+          toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 16L6 10H18L12 16Z" fill="currentColor"/></svg>';
+          lastLi.insertBefore(toggleBtn, lastLi.firstChild);
+          
+          lastLi.appendChild(newUl);
+          
+          // 添加点击事件
+          toggleBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.parentElement.classList.toggle("expanded");
+          });
+        }
+        
+        currentParent = newUl;
+        parentStack.push(newUl);
+        currentLevel = headingLevel;
+      } else if (headingLevel < currentLevel) {
+        // 回到上一级
+        const steps = currentLevel - headingLevel;
+        for (let i = 0; i < steps; i++) {
+          parentStack.pop();
+        }
+        currentParent = parentStack[parentStack.length - 1];
+        currentLevel = headingLevel;
+      }
+      
+      currentParent.appendChild(li);
+    });
+    
+    // 处理目录项，添加折叠功能
+    processListItems(ul);
+    
+    tocContent.appendChild(ul);
+  }
+  
+  // 处理目录项，添加折叠功能
+  function processListItems(ul) {
+    // 使用更高效的选择器直接找到有子目录的项
+    const itemsWithChildren = ul.querySelectorAll("li:has(ul)");
+    
+    itemsWithChildren.forEach(item => {
+      // 移除所有已存在的箭头和按钮，防止重叠
+      const existingArrows = item.querySelectorAll(".toggle-btn");
+      existingArrows.forEach(arrow => arrow.remove());
+      
+      // 有子目录的项添加可折叠功能
+      item.classList.add("has-children");
+      
+      // 添加折叠按钮
+      const toggleBtn = document.createElement("span");
+      toggleBtn.className = "toggle-btn";
+      // 使用箭头样式
+      toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z" fill="currentColor"/></svg>';
+      
+      // 添加点击事件
+      toggleBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.parentElement.classList.toggle("expanded");
+      });
+      
+      // 添加按钮到最前面
+      item.insertBefore(toggleBtn, item.firstChild);
+    });
+  }
+      
+  // 在每次页面加载完成后提取目录
+  document.addEventListener("astro:page-load", extractTableOfContents);
+  
+  // 确保在页面切换时也能正确处理目录
+  document.addEventListener("astro:after-swap", extractTableOfContents);
+
+</script>
 ```
 
