@@ -1,0 +1,28 @@
+/* 限制代码块高度，超出部分显示滚动条 */
+pre {
+  max-height: 300px; 
+  overflow-y: auto;
+  overflow-x: auto;
+} 
+
+
+/* 代码块行号显示 */
+pre {
+  counter-reset: line;
+}
+
+pre code .line {
+  counter-increment: line;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+pre code .line::before {
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  text-align: right;
+  color: #666;
+  font-size: 1em;
+  user-select: none;
+}

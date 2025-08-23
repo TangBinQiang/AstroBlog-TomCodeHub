@@ -44,21 +44,68 @@
 
   /* 目录列表样式 */
   .right-sidebar ul {
-    padding-left: 1rem;
+    padding-left: 1.25rem;
+    list-style: none;
+    margin: 0;
   }
 
+  /* 目录项基本样式 */
   .right-sidebar li {
+    position: relative;
     margin-bottom: 0.5rem;
+    line-height: 1.5;
   }
-
+  
+  /* 目录链接样式 */
   .right-sidebar a {
     color: var(--color-foreground);
     text-decoration: none;
     transition: color 0.2s;
+    display: inline-block;
   }
 
   .right-sidebar a:hover {
     color: var(--color-accent);
+  }
+  
+  /* 目录折叠功能样式 */
+  .right-sidebar li.has-children {
+    position: relative;
+  }
+  
+  /* 默认隐藏子列表 */
+  .right-sidebar li.has-children > ul {
+    display: none;
+  }
+  
+  /* 展开时显示子列表 */
+  .right-sidebar li.has-children.expanded > ul {
+    display: block;
+  }
+  
+  /* 折叠按钮样式 */
+  .right-sidebar .toggle-btn {
+    position: absolute;
+    left: -1.25rem;
+    top: 0.25rem;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+  }
+  
+  /* 折叠状态下箭头指向右侧 */
+  .right-sidebar li:not(.expanded) > .toggle-btn {
+    transform: rotate(0deg);
+  }
+  
+  /* 展开状态下箭头指向下方 */
+  .right-sidebar li.expanded > .toggle-btn {
+    transform: rotate(90deg);
   }
   
   /* 隐藏文章中的目录 */

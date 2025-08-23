@@ -113,7 +113,7 @@ const nextPost =
     <div class="post-content-wrapper">
       <article
         id="article"
-        class="app-prose mx-auto mt-8 prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+        class="app-prose mx-auto mt-0 prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
       >
         <Content />
       </article>
@@ -129,7 +129,7 @@ const nextPost =
     <EditPost class="sm:hidden" {hideEditPost} {post} />
 
     <ul class="mt-4 mb-8 sm:my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+      {tags.map((tag: string) => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
     </ul>
 
     <BackToTopButton />
@@ -148,7 +148,7 @@ const nextPost =
           >
             <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
             <div>
-              <span>上一篇 文章</span>
+              <span>Previous Post</span>
               <div class="text-sm text-accent/85">{prevPost.title}</div>
             </div>
           </a>
@@ -161,7 +161,7 @@ const nextPost =
             class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
           >
             <div>
-              <span>下一篇 文章</span>
+              <span>Next Post</span>
               <div class="text-sm text-accent/85">{nextPost.title}</div>
             </div>
             <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
@@ -293,8 +293,7 @@ const nextPost =
     window.scrollTo({ left: 0, top: 0, behavior: "instant" })
   );
   
- 
-  // 提取文章中的目录并显示在右侧边栏
+  // 提取文章中的目录并显示在右侧边栏，支持折叠功能
   function extractTableOfContents() {
     const article = document.getElementById("article");
     const tocContent = document.getElementById("toc-content");
@@ -324,16 +323,8 @@ const nextPost =
       // 复制目录内容到右侧边栏
       const tocList = tocDetails.querySelector("ul");
       if (tocList) {
-        // 复制目录内容
-        const clonedList = tocList.cloneNode(true);
-        
-        // 移除所有 # 符号
-        Array.from(clonedList.querySelectorAll("a")).forEach(link => {
-          // 移除链接文本中的 # 符号
-          link.textContent = link.textContent?.replace(/#/g, "").trim();
-        });
-        
-        tocContent.appendChild(clonedList);
+        // 处理目录内容，添加折叠功能
+        createCollapsibleToc(tocList, tocContent);
       }
     } else {
       // 如果没有找到目录，则生成一个基于标题的目录
@@ -345,37 +336,138 @@ const nextPost =
       );
       
       if (headings.length > 0) {
-        const ul = document.createElement("ul");
-        
-        headings.forEach(heading => {
-          const li = document.createElement("li");
-          const a = document.createElement("a");
-          
-          // 创建锚点ID（如果没有）
-          if (!heading.id) {
-            heading.id = heading.textContent?.trim().toLowerCase().replace(/\s+/g, "-") || "";
-          }
-          
-          a.href = `#${heading.id}`;
-          // 移除标题文本中的 # 符号
-          a.textContent = heading.textContent?.replace(/#/g, "").trim();
-          
-          // 根据标题级别添加缩进
-          if (heading.tagName === "H3") {
-            li.style.paddingLeft = "1rem";
-          } else if (heading.tagName === "H4") {
-            li.style.paddingLeft = "2rem";
-          }
-          
-          li.appendChild(a);
-          ul.appendChild(li);
-        });
-        
-        tocContent.appendChild(ul);
+        // 创建目录并添加折叠功能
+        createTocFromHeadings(headings, tocContent);
       }
     }
   }
   
+  // 从现有目录创建可折叠目录
+  function createCollapsibleToc(tocList, tocContent) {
+    // 复制目录内容
+    const clonedList = tocList.cloneNode(true);
+    
+    // 移除所有 # 符号
+    Array.from(clonedList.querySelectorAll("a")).forEach(link => {
+      // 移除链接文本中的 # 符号
+      if (link.textContent) {
+        link.textContent = link.textContent.replace(/#/g, "").trim();
+      }
+    });
+    
+    // 处理目录项，添加折叠功能
+    processListItems(clonedList);
+    
+    tocContent.appendChild(clonedList);
+  }
+  
+  // 从标题创建可折叠目录
+  function createTocFromHeadings(headings, tocContent) {
+    const ul = document.createElement("ul");
+    
+    // 跟踪当前的标题级别和父元素
+    let currentLevel = 2; // 从h2开始
+    let currentParent = ul;
+    let parentStack = [ul];
+    
+    headings.forEach(heading => {
+      const headingLevel = parseInt(heading.tagName.charAt(1));
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      
+      // 创建锚点ID（如果没有）
+      if (!heading.id) {
+        heading.id = heading.textContent?.trim().toLowerCase().replace(/\s+/g, "-") || "";
+      }
+      
+      a.href = `#${heading.id}`;
+      
+      // 移除标题文本中的 # 符号
+      if (heading.textContent) {
+        a.textContent = heading.textContent.replace(/#/g, "").trim();
+      } else {
+        a.textContent = "";
+      }
+      
+      li.appendChild(a);
+      
+      // 处理嵌套
+      if (headingLevel > currentLevel) {
+        // 创建新的子列表
+        const newUl = document.createElement("ul");
+        
+        // 添加折叠功能
+        const lastLi = currentParent.lastElementChild;
+        if (lastLi) {
+          lastLi.classList.add("has-children");
+          const toggleBtn = document.createElement("span");
+          toggleBtn.className = "toggle-btn";
+          toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 16L6 10H18L12 16Z" fill="currentColor"/></svg>';
+          lastLi.insertBefore(toggleBtn, lastLi.firstChild);
+          
+          lastLi.appendChild(newUl);
+          
+          // 添加点击事件
+          toggleBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.parentElement.classList.toggle("expanded");
+          });
+        }
+        
+        currentParent = newUl;
+        parentStack.push(newUl);
+        currentLevel = headingLevel;
+      } else if (headingLevel < currentLevel) {
+        // 回到上一级
+        const steps = currentLevel - headingLevel;
+        for (let i = 0; i < steps; i++) {
+          parentStack.pop();
+        }
+        currentParent = parentStack[parentStack.length - 1];
+        currentLevel = headingLevel;
+      }
+      
+      currentParent.appendChild(li);
+    });
+    
+    // 处理目录项，添加折叠功能
+    processListItems(ul);
+    
+    tocContent.appendChild(ul);
+  }
+  
+  // 处理目录项，添加折叠功能
+  function processListItems(ul) {
+    // 使用更高效的选择器直接找到有子目录的项
+    const itemsWithChildren = ul.querySelectorAll("li:has(ul)");
+    
+    itemsWithChildren.forEach(item => {
+      // 移除所有已存在的箭头和按钮，防止重叠
+      const existingArrows = item.querySelectorAll(".toggle-btn");
+      existingArrows.forEach(arrow => arrow.remove());
+      
+      // 有子目录的项添加可折叠功能
+      item.classList.add("has-children");
+      
+      // 添加折叠按钮
+      const toggleBtn = document.createElement("span");
+      toggleBtn.className = "toggle-btn";
+      // 使用箭头样式
+      toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z" fill="currentColor"/></svg>';
+      
+      // 添加点击事件
+      toggleBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.parentElement.classList.toggle("expanded");
+      });
+      
+      // 添加按钮到最前面
+      item.insertBefore(toggleBtn, item.firstChild);
+    });
+  }
+      
   // 在每次页面加载完成后提取目录
   document.addEventListener("astro:page-load", extractTableOfContents);
   

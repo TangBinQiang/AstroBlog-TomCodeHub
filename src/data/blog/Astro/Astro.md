@@ -2,8 +2,8 @@
 author: Sat Naing
 pubDatetime: 2025-08-20T15:44:00Z
 modDatetime: 2025-08-20T15:45:00Z
-title: Docs-Astro
-slug:  Docs-Astro
+title: Docs-Astro-paper
+slug:  Docs-Astro-paper
 featured: true
 draft: false
 tags:
@@ -15,307 +15,728 @@ AstroPaper is a highly customizable Astro blog theme. With AstroPaper, you can c
 
 ## Table of contents
 
-## 01创建Astro-paper项目
+## 1、创建Astro-paper项目
 
 > 本博客使用Astro-paper主题搭建。
 
-### 1.1命令安装Astro-paper主题
-
-``` bash
-# pnpm
-pnpm create astro@latest --template satnaing/astro-paper
-
-# npm
-npm create astro@latest -- --template satnaing/astro-paper
-
-# yarn
-yarn create astro --template satnaing/astro-paper
-
-# bun
-bun create astro@latest -- --template satnaing/astro-paper
-```
-
-### 安装项目依赖
+### 1.2 安装依赖
 
 ``` bash
 # install dependencies if you haven't done so in the previous step.
 pnpm install
 ```
 
-### 启动项目
+### 1.3 运行项目
 
 ``` bash
 # start running the project
 pnpm run dev
 ```
 
-## 构建项目
-
-### 安装插件
-
-``` bash
-pnpm add -D cpy-cli
-```
-> 安装一个跨平台的复制工具.
-
-### 修改build的构建命令
-
-``` json file=项目名/package.json
-{
-  "name": "astroblog-tomcodehub",
-  "type": "module",
-  "version": "5.5.0",
-  "scripts": {
-    "dev": "astro dev",
-    /* [!code --:1] */
-    "build": "astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/",
-    /* [!code ++:1] */
-    "build": "astro check && astro build && pagefind --site dist && cpy dist/pagefind/**/* public/pagefind/",
-    "preview": "astro preview",
-    "sync": "astro sync",
-    "astro": "astro",
-    "format:check": "prettier --check .",
-    "format": "prettier --write .",
-    "lint": "eslint ."
-  },
-  "dependencies": {
-    "@astrojs/rss": "^4.0.12",
-    "@astrojs/sitemap": "^3.4.1",
-    "@resvg/resvg-js": "^2.6.2",
-    "@tailwindcss/vite": "^4.1.11",
-    "astro": "^5.12.0",
-    "dayjs": "^1.11.13",
-    "lodash.kebabcase": "^4.1.1",
-    "remark-collapse": "^0.1.2",
-    "remark-toc": "^9.0.0",
-    "satori": "^0.15.2",
-    "sharp": "^0.34.2",
-    "tailwindcss": "^4.1.11"
-  },
-  "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@pagefind/default-ui": "^1.3.0",
-    "@shikijs/transformers": "^3.7.0",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/lodash.kebabcase": "^4.1.9",
-    "@typescript-eslint/parser": "^8.36.0",
-    "eslint": "^9.30.1",
-    "eslint-plugin-astro": "^1.3.1",
-    "globals": "^16.3.0",
-    "pagefind": "^1.3.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.13",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0"
-  }
-}
-```
-> 问题分析：构建脚本中的 cp -r dist/pagefind public/ 命令在 Windows 系统上失败了，因为 cp 是 Unix/Linux 命令，在 Windows 命令行中不存在。
-
-### 运行构建命令
-
-``` bash
-pnpm run build
-```
->注意：这里运行几次命令，如果还是失败，重新启动编译器，再次多次运行构建命令直到成功。
-
-### 运行项目 
+### 1.4 运行项目 
 
 ``` bash
 pnpm run dev
 ```
 > 查看search（搜索功能）是否成功。
 
-## 配置主题
+## 2、部署项目
+
 ``` bash
 echo "# Astro-paper_CN" >> README.md
 git init
 git add README.md
 git commit -m "first commit"
 git branch -M main
-git remote add origin https://github.com/TangBinQiang/Astro-paper_CN.git
+git remote add origin https://github.com/用户名/仓库名.git
 git push -u origin main
 ```
-## Configuring SITE
+> 注：如果是git clone下载astro-paper，记得删除项目里的.git文件。
 
-The important configurations resides in `src/config.ts` file. Within that file, you'll see the `SITE` object where you can specify your website's main configurations.
+## 3、配置主题
 
-During development, it's okay to leave `SITE.website` empty. But in production mode, you should specify your deployed url in `SITE.website` option since this will be used for canonical URL, social card URL etc.. which are important for SEO.
+### 3.1 配置文章页面布局
+> 双栏布局：左文章，右目录。
 
-```js file=src/config.ts
-export const SITE = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
-  author: "Sat Naing",
-  profile: "https://satnaing.dev/",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
-  title: "AstroPaper",
-  ogImage: "astropaper-og.jpg",
-  lightAndDarkMode: true,
-  postPerIndex: 4,
-  postPerPage: 4,
-  scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
-  showArchives: true,
-  showBackButton: true, // show back button in post detail
-  editPost: {
-    enabled: true,
-    text: "Suggest Changes",
-    url: "https://github.com/satnaing/astro-paper/edit/main/",
-  },
-  dynamicOgImage: true, // enable automatic dynamic og-image generation
-  dir: "ltr", // "rtl" | "auto"
-  lang: "en", // html lang code. Set this empty and default will be "en"
-  timezone: "Asia/Bangkok", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-} as const;
-```
+![](./img/image1.webp)
 
-Here are SITE configuration options
+#### 3.1.1 新建toc.css
 
-| Options               | Description                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `website`             | Your deployed website URL                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `author`              | Your name                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `profile`             | Your personal/portfolio website URL which is used for better SEO. Put `null` or empty string `""` if you don't have any.                                                                                                                                                                                                                                                                                                          |
-| `desc`                | Your site description. Useful for SEO and social media sharing.                                                                                                                                                                                                                                                                                                                                                                   |
-| `title`               | Your site name                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `ogImage`             | Your default OG image for the site. Useful for social media sharing. OG images can be an external image URL or they can be placed under `/public` directory.                                                                                                                                                                                                                                                                      |
-| `lightAndDarkMode`    | Enable or disable `light & dark mode` for the website. If disabled, primary color scheme will be used. This option is enabled by default.                                                                                                                                                                                                                                                                                         |
-| `postPerIndex`        | The number of posts to be displayed at the home page under `Recent` section.                                                                                                                                                                                                                                                                                                                                                      |
-| `postPerPage`         | You can specify how many posts will be displayed in each posts page. (eg: if you set `SITE.postPerPage` to 3, each page will only show 3 posts per page)                                                                                                                                                                                                                                                                          |
-| `scheduledPostMargin` | In Production mode, posts with a future `pubDatetime` will not be visible. However, if a post's `pubDatetime` is within the next 15 minutes, it will be visible. You can set `scheduledPostMargin` if you don't like the default 15 minutes margin.                                                                                                                                                                               |
-| `showArchives`        | Determines whether to display the `Archives` menu (positioned between the `About` and `Search` menus) and its corresponding page on the site. This option is set to `true` by default.                                                                                                                                                                                                                                            |
-| `showBackButton`      | Determines whether to display the `Go back` button in each blog post.                                                                                                                                                                                                                                                                                                                                                             |
-| `editPost`            | This option allows users to suggest changes to a blog post by providing an edit link under blog post titles. This feature can be disabled by setting `SITE.editPost.enabled` to `false`.                                                                                                                                                                                                                                          |
-| `dynamicOgImage`      | This option controls whether to [generate dynamic og-image](https://astro-paper.pages.dev/posts/dynamic-og-image-generation-in-astropaper-blog-posts/) if no `ogImage` is specified in the blog post frontmatter. If you have many blog posts, you might want to disable this feature. See the [trade-off](https://astro-paper.pages.dev/posts/dynamic-og-image-generation-in-astropaper-blog-posts/#trade-off) for more details. |
-| `dir`                 | Specifies the text direction of the entire blog. Used as [HTML dir attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/dir) in `<html dir="ltr">`. Supported values: `ltr` \| `rtl` \| `auto`                                                                                                                                                                                                |
-| `lang`                | Used as HTML ISO Language code in `<html lang"en">`. Default is `en`.                                                                                                                                                                                                                                                                                                                                                             |
-| `timezone`            | This option allows you to specify your timezone using the [IANA format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Setting this ensures consistent timestamps across your localhost and deployed site, eliminating time differences.                                                                                                                                                                          |
+``` css file=./src/styles
+/* 目录样式 */
+/* 文章布局调整为两栏 */
+@media (min-width: 1024px) {
+  .post-content-wrapper {
+    display: flex;
+    gap: 2rem;
+    position: relative;
+  }
 
-## Update layout width
+  /* 文章内容区域调整 */
+  .post-content-wrapper #article {
+    flex: 1;
+    max-width: calc(100% - 280px);
+  }
 
-The default `max-width` for the entire blog is `768px` (`max-w-3xl`). If you'd like to change it, you can easily update the `max-w-app` utility in your `global.css`. For instance:
+  /* 隐藏文章中原有的目录 */
+  .post-content-wrapper #article details summary:has(+ ul li a[href^="#"]) {
+    display: none;
+  }
+  
+  .post-content-wrapper #article details:has(summary:contains("Table of contents")) {
+    display: none;
+  }
 
-```css file=src/styles/global.css
-@utility max-w-app {
-  /* [!code --:1] */
-  @apply max-w-3xl;
-  /* [!code ++:1] */
-  @apply max-w-4xl xl:max-w-5xl;
+  /* 右侧边栏容器 */
+  .right-sidebar {
+    width: 250px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 1rem;
+    border-left: 1px solid var(--color-border);
+    font-size: 0.9rem;
+  }
+
+  /* 目录标题样式 */
+  .right-sidebar h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  /* 目录列表样式 */
+  .right-sidebar ul {
+    padding-left: 1rem;
+  }
+
+  .right-sidebar li {
+    margin-bottom: 0.5rem;
+  }
+
+  .right-sidebar a {
+    color: var(--color-foreground);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .right-sidebar a:hover {
+    color: var(--color-accent);
+  }
+  
+  /* 隐藏文章中的目录 */
+  #article h2:has(+ details):has(summary:contains("Table of contents")),
+  #article details:has(summary:contains("Table of contents")) {
+    display: none;
+  }
+}
+
+/* 移动端不显示右侧边栏 */
+@media (max-width: 1023px) {
+  .right-sidebar {
+    display: none;
+  }
 }
 ```
 
-You can explore more `max-width` values in the [Tailwind CSS docs](https://tailwindcss.com/docs/max-width).
+#### 3.1.2 修改PostDetails.astro
+``` astro file=./src/layouts/PostDetails.astro
+---
+import { render, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Tag from "@/components/Tag.astro";
+import Datetime from "@/components/Datetime.astro";
+import EditPost from "@/components/EditPost.astro";
+import ShareLinks from "@/components/ShareLinks.astro";
+import BackButton from "@/components/BackButton.astro";
+import BackToTopButton from "@/components/BackToTopButton.astro";
+import { getPath } from "@/utils/getPath";
+import { slugifyStr } from "@/utils/slugify";
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import { SITE } from "@/config";
 
-## Configuring logo or title
+export interface Props {
+  post: CollectionEntry<"blog">;
+  posts: CollectionEntry<"blog">[];
+}
 
-Prior to AstroPaper v5, you can update your site name/logo in `LOGO_IMAGE` object inside `src/config.ts` file. However, in AstroPaper v5, this option has been removed in favor of Astro's built-in SVG and Image components.
+const { post, posts } = Astro.props;
 
-![An arrow pointing at the website logo](https://res.cloudinary.com/noezectz/v1663911318/astro-paper/AstroPaper-logo-config_goff5l.png)
+const {
+  title,
+  author,
+  description,
+  ogImage: initOgImage,
+  canonicalURL,
+  pubDatetime,
+  modDatetime,
+  timezone,
+  tags,
+  hideEditPost,
+} = post.data;
 
-There are 3 options you can do:
+const { Content } = await render(post);
 
-### Option 1: SITE title text
+let ogImageUrl: string | undefined;
 
-This is the easiest option. You just have to update `SITE.title` in `src/config.ts` file.
+// Determine OG image source
+if (typeof initOgImage === "string") {
+  ogImageUrl = initOgImage; // Remote OG image (absolute URL)
+} else if (initOgImage?.src) {
+  ogImageUrl = initOgImage.src; // Local asset
+}
 
-### Option 2: Astro's SVG component
+// Use dynamic OG image if enabled and no remote|local ogImage
+if (!ogImageUrl && SITE.dynamicOgImage) {
+  ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
+}
 
-You might want to use this option if you want to use an SVG logo.
+// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
+const ogImage = ogImageUrl
+  ? new URL(ogImageUrl, Astro.url.origin).href
+  : undefined;
 
-- First add an SVG inside `src/assets` directory. (eg: `src/assets/dummy-logo.svg`)
-- Then import that SVG inside `Header.astro`
+const layoutProps = {
+  title: `${title} | ${SITE.title}`,
+  author,
+  description,
+  pubDatetime,
+  modDatetime,
+  canonicalURL,
+  ogImage,
+  scrollSmooth: true,
+};
 
-  ```astro file=src/components/Header.astro
-  ---
-  // ...
-  import DummyLogo from "@/assets/dummy-logo.svg";
-  ---
-  ```
+/* ========== Prev/Next Posts ========== */
 
-- Finally, replace `{SITE.title}` with imported logo.
+const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
+  id,
+  title,
+  filePath,
+}));
 
-  ```html
-  <a
-    href="/"
-    class="absolute py-1 text-left text-2xl leading-7 font-semibold whitespace-nowrap sm:static"
+const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
+
+const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
+const nextPost =
+  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+---
+
+<Layout {...layoutProps}>
+  <Header />
+  <BackButton />
+  <main
+    id="main-content"
+    class:list={[
+      "mx-auto w-full max-w-app px-4 pb-12",
+      { "mt-8": !SITE.showBackButton },
+    ]}
+    data-pagefind-body
   >
-    <DummyLogo class="scale-75 dark:invert" />
-    <!-- {SITE.title} -->
-  </a>
-  ```
+    <h1
+      transition:name={slugifyStr(title)}
+      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+    >
+      {title}
+    </h1>
+    <div class="my-2 flex items-center gap-2">
+      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span
+        aria-hidden="true"
+        class:list={[
+          "max-sm:hidden",
+          { hidden: !SITE.editPost.enabled || hideEditPost },
+        ]}>|</span
+      >
+      <EditPost {hideEditPost} {post} class="max-sm:hidden" />
+    </div>
+    /* [!code --:6] */
+    <article
+      id="article"
+      class="app-prose mx-auto mt-8 max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+    >
+      <Content />
+    </article>
+    
+    /* [!code ++:13] */
+    <div class="post-content-wrapper">
+      <article
+        id="article"
+        class="app-prose mx-auto mt-8 prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+      >
+        <Content />
+      </article>
+      
+      <div class="right-sidebar">
+        <h2>目录</h2>
+        <div id="toc-content"></div>
+      </div>
+    </div>
 
-The best part of this approach is that you can customize your SVG styles as needed. In the example above, you can see how the SVG logo color can be inverted in dark mode.
+    <hr class="my-8 border-dashed" />
 
-### Option 3: Astro's Image component
+    <EditPost class="sm:hidden" {hideEditPost} {post} />
 
-If your logo is an image but not SVG, you can use Astro's Image component.
+    <ul class="mt-4 mb-8 sm:my-8">
+      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+    </ul>
 
-- Add your logo inside `src/assets` directory. (eg: `src/assets/dummy-logo.png`)
-- Import `Image` and your logo in `Header.astro`
+    <BackToTopButton />
 
-  ```astro file=src/components/Header.astro
-  ---
-  // ...
-  import { Image } from "astro:assets";
-  import dummyLogo from "@/assets/dummy-logo.png";
-  ---
-  ```
+    <ShareLinks />
 
-- Then, replace `{SITE.title}` with imported logo.
+    <hr class="my-6 border-dashed" />
 
-  ```html
-  <a
-    href="/"
-    class="absolute py-1 text-left text-2xl leading-7 font-semibold whitespace-nowrap sm:static"
-  >
-    <image src="{dummyLogo}" alt="Dummy Blog" class="dark:invert" />
-    <!-- {SITE.title} -->
-  </a>
-  ```
+    <!-- Previous/Next Post Buttons -->
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {
+        prevPost && (
+          <a
+            href={getPath(prevPost.id, prevPost.filePath)}
+            class="flex w-full gap-1 hover:opacity-75"
+          >
+            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
+            <div>
+              <span>上一篇 文章</span>
+              <div class="text-sm text-accent/85">{prevPost.title}</div>
+            </div>
+          </a>
+        )
+      }
+      {
+        nextPost && (
+          <a
+            href={getPath(nextPost.id, nextPost.filePath)}
+            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
+          >
+            <div>
+              <span>下一篇 文章</span>
+              <div class="text-sm text-accent/85">{nextPost.title}</div>
+            </div>
+            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+          </a>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
+</Layout>
 
-With this approach, you can still adjust your image's appearance using CSS classes. However, this might not always fit what you want. If you need to display different logo images based on light or dark mode, check how light/dark icons are handled inside the `Header.astro` component.
+<script is:inline data-astro-rerun>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
 
-## Configuring social links
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.id = "myBar";
 
-![An arrow pointing at social link icons](https://github.com/user-attachments/assets/8b895400-d088-442f-881b-02d2443e00cf)
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
 
-You can configure social links in `SOCIALS` object inside `constants.ts`.
+    // Append the progress container to the document body or any other desired parent element
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
 
-```ts file=src/constants.ts
-export const SOCIALS = [
-  {
-    name: "GitHub",
-    href: "https://github.com/satnaing/astro-paper",
-    linkTitle: ` ${SITE.title} on GitHub`,
-    icon: IconGitHub,
-  },
-  {
-    name: "X",
-    href: "https://x.com/username",
-    linkTitle: `${SITE.title} on X`,
-    icon: IconBrandX,
-  },
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/username/",
-    linkTitle: `${SITE.title} on LinkedIn`,
-    icon: IconLinkedin,
-  },
-  {
-    name: "Mail",
-    href: "mailto:yourmail@gmail.com",
-    linkTitle: `Send an email to ${SITE.title}`,
-    icon: IconMail,
-  },
-] as const;
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    const copyButtonLabel = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      // Check if --file-name-offset custom property exists
+      const computedStyle = getComputedStyle(codeBlock);
+      const hasFileNameOffset =
+        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+
+      // Determine the top positioning class
+      const topClass = hasFileNameOffset
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      const text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /* Go to page start after page swap */
+  document.addEventListener("astro:after-swap", () =>
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+  );
+  
+  /* [!code ++:87] */
+  // 提取文章中的目录并显示在右侧边栏
+  function extractTableOfContents() {
+    const article = document.getElementById("article");
+    const tocContent = document.getElementById("toc-content");
+    
+    if (!article || !tocContent) return;
+    
+    // 清空目录内容，避免重复
+    tocContent.innerHTML = "";
+    
+    // 查找文章中的目录
+    const tocDetails = Array.from(article.querySelectorAll("details")).find(
+      details => {
+        const summary = details.querySelector("summary");
+        return summary && summary.textContent?.trim() === "Table of contents";
+      }
+    );
+    
+    // 先隐藏所有可能的目录元素
+    Array.from(article.querySelectorAll("details")).forEach(details => {
+      const summary = details.querySelector("summary");
+      if (summary && summary.textContent?.trim() === "Table of contents") {
+        details.style.display = "none";
+      }
+    });
+    
+    if (tocDetails) {
+      // 复制目录内容到右侧边栏
+      const tocList = tocDetails.querySelector("ul");
+      if (tocList) {
+        // 复制目录内容
+        const clonedList = tocList.cloneNode(true);
+        
+        // 移除所有 # 符号
+        Array.from(clonedList.querySelectorAll("a")).forEach(link => {
+          // 移除链接文本中的 # 符号
+          link.textContent = link.textContent?.replace(/#/g, "").trim();
+        });
+        
+        tocContent.appendChild(clonedList);
+      }
+    } else {
+      // 如果没有找到目录，则生成一个基于标题的目录
+      const headings = Array.from(article.querySelectorAll("h2, h3, h4")).filter(
+        heading => {
+          const headingText = heading.textContent?.trim() || "";
+          return headingText !== "Table of contents";
+        }
+      );
+      
+      if (headings.length > 0) {
+        const ul = document.createElement("ul");
+        
+        headings.forEach(heading => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          
+          // 创建锚点ID（如果没有）
+          if (!heading.id) {
+            heading.id = heading.textContent?.trim().toLowerCase().replace(/\s+/g, "-") || "";
+          }
+          
+          a.href = `#${heading.id}`;
+          // 移除标题文本中的 # 符号
+          a.textContent = heading.textContent?.replace(/#/g, "").trim();
+          
+          // 根据标题级别添加缩进
+          if (heading.tagName === "H3") {
+            li.style.paddingLeft = "1rem";
+          } else if (heading.tagName === "H4") {
+            li.style.paddingLeft = "2rem";
+          }
+          
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+        
+        tocContent.appendChild(ul);
+      }
+    }
+  }
+  
+  // 在每次页面加载完成后提取目录
+  document.addEventListener("astro:page-load", extractTableOfContents);
+  
+  // 确保在页面切换时也能正确处理目录
+  document.addEventListener("astro:after-swap", extractTableOfContents);
+</script>
 ```
 
-## Configuring share links
+### 3.2 配置目录的折叠功能
+> 配置右侧目录的折叠功能，如果文章目录多可以配置该功能。
 
-You can configure share links in `SHARE_LINKS` object inside `src/constants.ts`.
+#### 3.2.1 修改toc.css
+> 直接复制文件，覆盖toc.css即可
+``` css file=./src/style/toc.css
+/* 目录样式 */
+/* 文章布局调整为两栏 */
+@media (min-width: 1024px) {
+  .post-content-wrapper {
+    display: flex;
+    gap: 2rem;
+    position: relative;
+  }
 
-![An arrow pointing at share link icons](https://github.com/user-attachments/assets/4f930b68-b625-45df-8c41-e076dd2b838e)
+  /* 文章内容区域调整 */
+  .post-content-wrapper #article {
+    flex: 1;
+    max-width: calc(100% - 280px);
+  }
 
-## Conclusion
+  /* 隐藏文章中原有的目录 */
+  .post-content-wrapper #article details summary:has(+ ul li a[href^="#"]) {
+    display: none;
+  }
+  
+  .post-content-wrapper #article details:has(summary:contains("Table of contents")) {
+    display: none;
+  }
 
-This is the brief specification of how you can customize this theme. You can customize more if you know some coding. For customizing styles, please read [this article](https://astro-paper.pages.dev/posts/customizing-astropaper-theme-color-schemes/). Thanks for reading.✌🏻
+  /* 右侧边栏容器 */
+  .right-sidebar {
+    width: 250px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 1rem;
+    border-left: 1px solid var(--color-border);
+    font-size: 0.9rem;
+  }
+
+  /* 目录标题样式 */
+  .right-sidebar h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  /* 目录列表样式 */
+  .right-sidebar ul {
+    padding-left: 1.25rem;
+    list-style: none;
+    margin: 0;
+  }
+
+  /* 目录项基本样式 */
+  .right-sidebar li {
+    position: relative;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+  
+  /* 目录链接样式 */
+  .right-sidebar a {
+    color: var(--color-foreground);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-block;
+  }
+
+  .right-sidebar a:hover {
+    color: var(--color-accent);
+  }
+  
+  /* 目录折叠功能样式 */
+  .right-sidebar li.has-children {
+    position: relative;
+  }
+  
+  /* 默认隐藏子列表 */
+  .right-sidebar li.has-children > ul {
+    display: none;
+  }
+  
+  /* 展开时显示子列表 */
+  .right-sidebar li.has-children.expanded > ul {
+    display: block;
+  }
+  
+  /* 折叠按钮样式 */
+  .right-sidebar .toggle-btn {
+    position: absolute;
+    left: -1.25rem;
+    top: 0.25rem;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+  }
+  
+  /* 折叠状态下箭头指向右侧 */
+  .right-sidebar li:not(.expanded) > .toggle-btn {
+    transform: rotate(0deg);
+  }
+  
+  /* 展开状态下箭头指向下方 */
+  .right-sidebar li.expanded > .toggle-btn {
+    transform: rotate(90deg);
+  }
+  
+  /* 隐藏文章中的目录 */
+  #article h2:has(+ details):has(summary:contains("Table of contents")),
+  #article details:has(summary:contains("Table of contents")) {
+    display: none;
+  }
+}
+
+/* 移动端不显示右侧边栏 */
+@media (max-width: 1023px) {
+  .right-sidebar {
+    display: none;
+  }
+}
+```
+
+#### 3.2.2 修改PostDetails.astro
+> 直接复制文件，覆盖PostDetails.astro即可。
+``` yml file=./src/layouts/PostDetails.astro
+# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
+#
+name: Deploy VitePress site to Pages
+
+on:
+  # 在针对 `main` 分支的推送上运行。如果你
+  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
+  push:
+    branches: [main]
+
+  # 允许你从 Actions 选项卡手动运行此工作流程
+  workflow_dispatch:
+
+# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列
+# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # 构建工作
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
+      - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消此区域注释
+        with:
+          version: 9
+      # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm # 或 pnpm / yarn
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Install dependencies
+        run: pnpm install # 或 pnpm install / yarn install / bun install
+      - name: Build with VitePress
+        run: pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .vitepress/dist
+
+  # 部署工作
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
