@@ -2,8 +2,8 @@
 author: Sat Naing
 pubDatetime: 2025-08-20T15:44:00Z
 modDatetime: 2025-08-20T15:45:00Z
-title: vitepress
-slug:  vitepress
+title: Docs-vitepress
+slug:  Docs-vitepress
 featured: true
 draft: false
 tags:
