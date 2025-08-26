@@ -10,9 +10,9 @@ pre {
 
 /* 添加对长代码行的处理 */
 pre code {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  white-space: pre;         /* 不换行 */
+  word-wrap: normal;        /* 不允许长单词换行 */
+  overflow-wrap: normal;    /* 不允许单词换行 */
   display: block;
   width: 100%;
 }
@@ -23,9 +23,9 @@ details pre {
 }
 
 details pre code {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  white-space: pre;         /* 不换行 */
+  word-wrap: normal;        /* 不允许长单词换行 */
+  overflow-wrap: normal;    /* 不允许单词换行 */
   width: 100%;
 }
 
