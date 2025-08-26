@@ -44,6 +44,8 @@ html[data-theme="dark"] {
   }
   body {
     @apply flex min-h-svh flex-col bg-background font-mono text-foreground selection:bg-accent/75 selection:text-background;
+    /* 确保body也禁用滑动返回手势 */
+    overscroll-behavior: none;
   }
   a,
   button {
