@@ -4,11 +4,8 @@ pre {
   overflow-y: auto;
   overflow-x: auto;
 
-  /* 关键代码：只允许垂直滚动，禁用水平手势 */
-  touch-action: pan-y;
-  
-  /* iOS Safari 优化 */
-  -webkit-overflow-scrolling: touch;
+  /* 添加这一行来防止水平滚动触发页面后退 */
+  overscroll-behavior-x: contain;
 } 
 
 
