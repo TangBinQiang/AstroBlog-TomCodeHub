@@ -4,8 +4,10 @@ pre {
   overflow-y: auto;
   overflow-x: auto;
 
-  /* 添加这一行来防止水平滚动触发页面后退 */
+  /* 防止水平滑动触发页面后退 */
   overscroll-behavior-x: contain;
+  touch-action: pan-y; /* 只允许垂直滑动 */
+  -webkit-overflow-scrolling: touch; /* 为iOS设备提供平滑滚动 */
 } 
 
 
