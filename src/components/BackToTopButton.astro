@@ -55,7 +55,14 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
     function handleScroll() {
       const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
       const scrollTop = rootElement.scrollTop;
-      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+      
+      // 修改计算方式，确保在页面底部时能达到100%
+      let scrollPercent = Math.min(100, Math.floor((scrollTop / scrollTotal) * 100));
+      
+      // 如果滚动到接近底部（例如95%以上），则强制设为100%以确保圆圈完整
+      if (scrollPercent > 99) {
+        scrollPercent = 100;
+      }
 
       progressIndicator.style.setProperty(
         "background-image",
@@ -72,6 +79,9 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
         lastVisible = isVisible;
       }
     }
+
+    // 初始调用一次，确保页面加载时就计算正确
+    handleScroll();
 
     let ticking = false;
     document.addEventListener("scroll", () => {
