@@ -1170,6 +1170,55 @@ function greet(name) {
 ```
 </details>
 
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+
 
 <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
     <iframe 
