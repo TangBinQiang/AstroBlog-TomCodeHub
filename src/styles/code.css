@@ -3,14 +3,17 @@ pre {
   max-height: 300px; 
   overflow-y: auto;
   overflow-x: auto;
+  
 } 
 
 
 /* 代码块行号显示 */
 pre {
   counter-reset: line;
-    /* 只允许在代码块内部滚动 */
+  /* 防止滑动返回的关键CSS */
+  position: relative;
   touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
 }
 
 pre code .line {
