@@ -11,7 +11,7 @@ pre {
 pre {
   counter-reset: line;
   /* 防止滑动返回的关键CSS */
-  position: relative;
+  /* position: relative; */
   touch-action: manipulation;
   -webkit-overflow-scrolling: touch;
 }
