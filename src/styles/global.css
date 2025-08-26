@@ -38,6 +38,9 @@ html[data-theme="dark"] {
   }
   html {
     @apply overflow-y-scroll scroll-smooth;
+    /* 禁用整个页面的滑动返回手势 */
+    overscroll-behavior: none;
+    touch-action: pan-y pinch-zoom;
   }
   body {
     @apply flex min-h-svh flex-col bg-background font-mono text-foreground selection:bg-accent/75 selection:text-background;
