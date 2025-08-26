@@ -10,6 +10,9 @@ pre {
 /* 代码块行号显示 */
 pre {
   counter-reset: line;
+  
+  touch-action: pan-x pan-y;
+
 }
 
 pre code .line {
@@ -27,3 +30,4 @@ pre code .line::before {
   font-size: 1em;
   user-select: none;
 }
+
