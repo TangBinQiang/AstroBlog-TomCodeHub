@@ -3,6 +3,12 @@ pre {
   max-height: 300px; 
   overflow-y: auto;
   overflow-x: auto;
+
+  /* 关键代码：只允许垂直滚动，禁用水平手势 */
+  touch-action: pan-y;
+  
+  /* iOS Safari 优化 */
+  -webkit-overflow-scrolling: touch;
 } 
 
 
