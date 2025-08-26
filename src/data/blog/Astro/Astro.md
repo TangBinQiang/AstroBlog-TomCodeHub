@@ -1150,6 +1150,27 @@ const nextPost =
 
 </script>
 ```
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;
+}
+```
+</details>
+
+<details open>
+<summary>默认展开的代码块</summary>
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+```
+</details>
+
+
 <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
     <iframe 
         src="//player.bilibili.com/player.html?isOutside=true&aid=115015264900259&bvid=BV176tdzrE9b&cid=31645763766&p=1" 
