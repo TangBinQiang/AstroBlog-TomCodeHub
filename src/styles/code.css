@@ -8,7 +8,7 @@ pre {
   display: block;
 } 
 
-/* 添加对长代码行的处理 */
+/* 添加对代码块里长代码行的处理 */
 pre code {
   white-space: pre;         /* 不换行 */
   word-wrap: normal;        /* 不允许长单词换行 */
