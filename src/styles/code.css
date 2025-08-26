@@ -9,6 +9,8 @@ pre {
 /* 代码块行号显示 */
 pre {
   counter-reset: line;
+    /* 只允许在代码块内部滚动 */
+  touch-action: manipulation;
 }
 
 pre code .line {
