@@ -22,12 +22,12 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
   >
     <span
       id="progress-indicator"
-      class="absolute inset-0 -z-10 block size-14 scale-100 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"
+      class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"
     ></span>
     <IconChevronLeft class="inline-block rotate-90 md:hidden" />
     <span class="sr-only text-sm group-hover:text-accent md:not-sr-only">
       <IconArrowNarrowUp class="inline-block size-4" />
-      Back To Top
+      返回 顶部
     </span>
   </button>
 </div>
@@ -55,14 +55,21 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
     function handleScroll() {
       const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
       const scrollTop = rootElement.scrollTop;
-      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+      
+      // 修改计算方式，确保在页面底部时能达到100%
+      let scrollPercent = Math.min(100, Math.floor((scrollTop / scrollTotal) * 100));
+      
+      //如果滚动到接近底部（例如95%以上），则强制设为100%以确保圆圈完整
+      if (scrollPercent > 98.5) {
+        scrollPercent = 100;
+      }
 
       progressIndicator.style.setProperty(
         "background-image",
         `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`
       );
 
-      const isVisible = scrollTop / scrollTotal > 0.3;
+      const isVisible = scrollTop / scrollTotal > 0.1;
 
       if (isVisible !== lastVisible) {
         btnContainer.classList.toggle("opacity-100", isVisible);
@@ -72,6 +79,9 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
         lastVisible = isVisible;
       }
     }
+
+    // 初始调用一次，确保页面加载时就计算正确
+    // handleScroll();
 
     let ticking = false;
     document.addEventListener("scroll", () => {
