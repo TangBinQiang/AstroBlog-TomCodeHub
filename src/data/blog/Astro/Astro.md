@@ -1,7 +1,7 @@
 ---
 author: Sat Naing
-pubDatetime: 2025-08-20T15:44:00Z
-modDatetime: 2025-08-20T15:45:00Z
+pubDatetime: 2025-08-20T00:00:00Z
+modDatetime: 2025-08-20T00:00:00Z
 title: Docs-Astro-paper
 slug:  Docs-Astro-paper
 featured: true
