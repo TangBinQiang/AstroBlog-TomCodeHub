@@ -12,6 +12,8 @@ tags:
 description: 测试博客
 ---
 
+AstroPaper is a highly customizable Astro blog theme. With AstroPaper, you can customize everything according to your personal taste. This article will explain how you can make some customizations easily in the config file.
+
 <details open>
 <summary>默认展开的代码块</summary>
 
