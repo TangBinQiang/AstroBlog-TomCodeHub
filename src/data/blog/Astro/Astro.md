@@ -62,7 +62,7 @@ git push -u origin main
 
 #### 3.1.1 新建toc.css
 
-``` css file=./src/styles
+``` css file=./src/style/toc.css
 /* 目录样式 */
 /* 文章布局调整为两栏 */
 @media (min-width: 1024px) {
@@ -141,7 +141,12 @@ git push -u origin main
 }
 ```
 
-#### 3.1.2 修改PostDetails.astro
+#### 3.1.2 引入toc.css
+``` css file=./src/style/global.css
+@import "./toc.css";
+```
+
+#### 3.1.3 修改PostDetails.astro
 ``` astro file=./src/layouts/PostDetails.astro
 ---
 import { render, type CollectionEntry } from "astro:content";
@@ -1150,85 +1155,195 @@ const nextPost =
 
 </script>
 ```
-<details open>
-<summary>默认展开的代码块</summary>
 
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;return `Hello, ${name}!`;
+### 3.3 配置代码块
+> 设置代码行和代码块的响应式宽度
+
+#### 3.3.1 新建code.css
+``` css file=./src/styles/code.css
+/* 限制代码块高度，超出部分显示滚动条 */
+pre {
+  max-height: 300px; 
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+} 
+
+/* 添加对代码块里长代码行的处理 */
+pre code {
+  white-space: pre;         /* 不换行 */
+  word-wrap: normal;        /* 不允许长单词换行 */
+  overflow-wrap: normal;    /* 不允许单词换行 */
+  display: block;
+  width: 100%;
 }
-```
-</details>
 
-<details open>
-<summary>默认展开的代码块</summary>
-
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+/* 处理details标签内的代码块 */
+details pre {
+  width: 100%;
 }
-```
-</details>
 
-<details open>
-<summary>默认展开的代码块</summary>
-
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+details pre code {
+  white-space: pre;         /* 不换行 */
+  word-wrap: normal;        /* 不允许长单词换行 */
+  overflow-wrap: normal;    /* 不允许单词换行 */
+  width: 100%;
 }
-```
-</details>
 
-<details open>
-<summary>默认展开的代码块</summary>
-
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+/* 确保所有代码块容器宽度一致 */
+.astro-code,
+pre,
+details pre,
+details .astro-code {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
 }
-```
-</details>
 
-<details open>
-<summary>默认展开的代码块</summary>
-
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+/* 强制折叠代码块与其他代码块宽度一致 */
+details .astro-code {
+  min-width: 100% !important;
+  display: block !important;
 }
-```
-</details>
-<details open>
-<summary>默认展开的代码块</summary>
 
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+/* 修复折叠代码块的父容器宽度 */
+details {
+  width: 100% !important;
+  display: block !important;
 }
-```
-</details>
 
-<details open>
-<summary>默认展开的代码块</summary>
-
-```javascript
-function greet(name) {
-    return `Hello, ${name}!`;
+/* 代码块行号显示 */
+pre {
+  counter-reset: line;
 }
+
+pre code .line {
+  counter-increment: line;
+  position: relative;
+  padding-left: 2rem;
+}
+
+pre code .line::before {
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  text-align: right;
+  color: #666;
+  font-size: 1em;
+} 
 ```
-</details>
+#### 3.3.2 引入code.css
 
+``` css file=./src/styles/global.css
+@import "./code.css";
+```
 
-<div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
-    <iframe 
-        src="//player.bilibili.com/player.html?isOutside=true&aid=115015264900259&bvid=BV176tdzrE9b&cid=31645763766&p=1" 
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-        scrolling="no" 
-        border="0" 
-        frameborder="no" 
-        framespacing="0" 
-        allowfullscreen="true">
-    </iframe>
+### 3.4 配置BackToTopButton
+> 配置返回顶部组件的下划进度条样式逻辑，以适应不同移动端设备。</br>
+> 注：如果你不常用移动端或者没有强迫症可以不用配置。
+
+``` js
+---
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
+---
+
+<div
+  id="btt-btn-container"
+  class:list={[
+    "fixed end-4 bottom-8 z-50",
+    "md:sticky md:end-auto md:float-end md:me-1",
+    "translate-y-14 opacity-0 transition duration-500",
+  ]}
+>
+  <button
+    data-button="back-to-top"
+    class:list={[
+      "group relative bg-background px-2 py-1",
+      "size-14 rounded-full shadow-xl",
+      "md:h-8 md:w-fit md:rounded-md md:shadow-none md:focus-visible:rounded-none",
+      "md:bg-background/35 md:bg-clip-padding md:backdrop-blur-lg",
+    ]}
+  >
+    <span
+      id="progress-indicator"
+      class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"
+    ></span>
+    <IconChevronLeft class="inline-block rotate-90 md:hidden" />
+    <span class="sr-only text-sm group-hover:text-accent md:not-sr-only">
+      <IconArrowNarrowUp class="inline-block size-4" />
+      Back To Top
+    </span>
+  </button>
 </div>
+
+<script is:inline data-astro-rerun>
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    const rootElement = document.documentElement;
+    const btnContainer = document.querySelector("#btt-btn-container");
+    const backToTopBtn = document.querySelector("[data-button='back-to-top']");
+    const progressIndicator = document.querySelector("#progress-indicator");
+
+    if (!rootElement || !btnContainer || !backToTopBtn || !progressIndicator)
+      return;
+
+    // Attach click event handler for back-to-top button
+    backToTopBtn.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+
+    // Handle button visibility according to scroll position
+    let lastVisible = null;
+    function handleScroll() {
+      const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+      const scrollTop = rootElement.scrollTop;
+      /* [!code --:1] */
+      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+
+      /* [!code ++:7] */
+      // 修改计算方式，确保在页面底部时能达到100%
+      let scrollPercent = Math.min(100, Math.floor((scrollTop / scrollTotal) * 100));
+      
+      //如果滚动到接近底部（例如95%以上），则强制设为100%以确保圆圈完整
+      if (scrollPercent > 98.5) {
+        scrollPercent = 100;
+      }
+
+
+      progressIndicator.style.setProperty(
+        "background-image",
+        `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`
+      );
+
+      //配置下拉到页面的百分比时出现返回顶部的组件（0.3=30%，推荐改为0.1）
+      const isVisible = scrollTop / scrollTotal > 0.3;
+
+      if (isVisible !== lastVisible) {
+        btnContainer.classList.toggle("opacity-100", isVisible);
+        btnContainer.classList.toggle("translate-y-0", isVisible);
+        btnContainer.classList.toggle("opacity-0", !isVisible);
+        btnContainer.classList.toggle("translate-y-14", !isVisible);
+        lastVisible = isVisible;
+      }
+    }
+
+    let ticking = false;
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+  backToTop();
+</script>
+```
 
