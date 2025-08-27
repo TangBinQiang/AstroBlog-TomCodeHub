@@ -64,7 +64,7 @@ function greet(name) {
 ```
 </details>
 <details open>
-<summary>默认展开的代码块</summary>
+<summary>默认展开的代码块01</summary>
 
 ```javascript
 function greet(name) {
