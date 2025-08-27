@@ -1166,9 +1166,6 @@ pre {
   max-height: 300px; 
   overflow-y: auto;
   overflow-x: auto;
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
 } 
 
 /* 添加对代码块里长代码行的处理 */
@@ -1176,8 +1173,6 @@ pre code {
   white-space: pre;         /* 不换行 */
   word-wrap: normal;        /* 不允许长单词换行 */
   overflow-wrap: normal;    /* 不允许单词换行 */
-  display: block;
-  width: 100%;
 }
 
 /* 处理details标签内的代码块 */
@@ -1190,16 +1185,6 @@ details pre code {
   word-wrap: normal;        /* 不允许长单词换行 */
   overflow-wrap: normal;    /* 不允许单词换行 */
   width: 100%;
-}
-
-/* 确保所有代码块容器宽度一致 */
-.astro-code,
-pre,
-details pre,
-details .astro-code {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  display: block !important;
 }
 
 /* 强制折叠代码块与其他代码块宽度一致 */
