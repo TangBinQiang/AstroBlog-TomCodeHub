@@ -467,11 +467,105 @@ const nextPost =
       item.insertBefore(toggleBtn, item.firstChild);
     });
   }
+  
+  function setupScrollSpy() {
+    const article = document.getElementById("article");
+    const tocContent = document.getElementById("toc-content");
+    
+    if (!article || !tocContent) return;
+    
+    // 获取所有标题元素
+    const headings = Array.from(article.querySelectorAll("h2, h3, h4")).filter(
+      heading => {
+        const headingText = heading.textContent?.trim() || "";
+        return headingText !== "Table of contents";
+      }
+    );
+    
+    // 获取所有目录链接
+    const tocLinks = Array.from(tocContent.querySelectorAll("a"));
+    
+    // 获取所有可折叠的目录项
+    const collapsibleItems = Array.from(tocContent.querySelectorAll("li.has-children"));
+    
+    // 上一个活动的链接
+    let activeLink = null;
+    
+    // 监听滚动事件
+    function onScroll() {
+      // 获取当前滚动位置
+      const scrollPosition = window.scrollY + 100; // 添加偏移量，提前高亮
       
-  // 在每次页面加载完成后提取目录
-  document.addEventListener("astro:page-load", extractTableOfContents);
+      // 找到当前可见的标题
+      let currentHeading = null;
+      
+      for (const heading of headings) {
+        if (heading.offsetTop <= scrollPosition) {
+          currentHeading = heading;
+        } else {
+          break;
+        }
+      }
+      
+      // 如果找到当前标题，高亮对应的目录项
+      if (currentHeading) {
+        const headingId = currentHeading.id;
+        
+        // 移除之前的活动状态
+        if (activeLink) {
+          activeLink.classList.remove("active");
+        }
+        
+        // 找到对应的目录链接
+        const targetLink = tocLinks.find(link => link.getAttribute("href") === `#${headingId}`);
+        
+        if (targetLink) {
+          // 添加活动状态
+          targetLink.classList.add("active");
+          activeLink = targetLink;
+          
+          // 先折叠所有目录项
+          collapsibleItems.forEach(item => {
+            item.classList.remove("expanded");
+          });
+          
+          // 展开当前目录项的父级目录
+          let parent = targetLink.parentElement;
+          while (parent && parent !== tocContent) {
+            if (parent.classList.contains("has-children")) {
+              parent.classList.add("expanded");
+            }
+            parent = parent.parentElement;
+          }
+        }
+      }
+    }
+    
+    // 节流函数，避免频繁触发
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          onScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+    
+    // 初始化时执行一次
+    onScroll();
+  }
+  
+  // 在每次页面加载完成后提取目录并设置滚动监听
+  document.addEventListener("astro:page-load", () => {
+    extractTableOfContents();
+    setupScrollSpy();
+  });
   
   // 确保在页面切换时也能正确处理目录
-  document.addEventListener("astro:after-swap", extractTableOfContents);
-
+  document.addEventListener("astro:after-swap", () => {
+    extractTableOfContents();
+    setupScrollSpy();
+  });
 </script>

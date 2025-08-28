@@ -68,6 +68,12 @@
     color: var(--color-accent);
   }
   
+  /* 当前活动目录项样式 */
+  .right-sidebar a.active {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  
   /* 目录折叠功能样式 */
   .right-sidebar li.has-children {
     position: relative;
