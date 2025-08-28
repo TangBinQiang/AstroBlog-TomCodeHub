@@ -1,4 +1,4 @@
-// 禁用滑动导航手势
+// 滑动导航手势控制
 (function() {
   // 初始触摸位置
   let startX = 0;
@@ -18,16 +18,27 @@
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length > 1) return; // 忽略多点触控
     
+    // 检查触摸事件是否发生在代码块元素上
+    const target = e.target;
+    const isCodeBlock = target.closest('pre') !== null || 
+                        target.closest('code') !== null ||
+                        target.tagName === 'PRE' || 
+                        target.tagName === 'CODE';
+    
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
     const deltaX = currentX - startX;
     const deltaY = currentY - startY;
     
-    // 只在屏幕左侧边缘开始的向右滑动时阻止默认行为
+    // 只在屏幕左侧边缘开始的向右滑动时处理
     if (Math.abs(deltaX) > Math.abs(deltaY) && !isScrolling) {
-      // 只有当起始点在屏幕左侧边缘(50px内)且是向右滑动时才阻止
+      // 只有当起始点在屏幕左侧边缘(50px内)且是向右滑动时
       if (startX < 50 && deltaX > threshold) {
-        e.preventDefault();
+        // 如果是在代码块上，阻止默认行为
+        if (isCodeBlock) {
+          e.preventDefault();
+        }
+        // 在非代码块区域，不阻止默认行为，允许浏览器的滑动返回
       }
     } else {
       isScrolling = true;
@@ -38,8 +49,15 @@
   document.addEventListener('astro:page-load', function() {
     // 重新绑定事件处理程序，确保在页面过渡后仍然有效
     const disableHistoryNavigation = function(e) {
-      if (e.type === 'popstate') {
-        // 阻止浏览器默认的历史导航行为
+      // 检查当前活动元素是否为代码块
+      const activeElement = document.activeElement;
+      const isCodeBlock = activeElement.closest('pre') !== null || 
+                          activeElement.closest('code') !== null ||
+                          activeElement.tagName === 'PRE' || 
+                          activeElement.tagName === 'CODE';
+      
+      if (e.type === 'popstate' && isCodeBlock) {
+        // 只在代码块区域阻止浏览器默认的历史导航行为
         history.pushState(null, document.title, location.href);
       }
     };
