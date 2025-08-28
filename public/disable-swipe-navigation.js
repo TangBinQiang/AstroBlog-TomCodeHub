@@ -48,9 +48,9 @@
     window.addEventListener('popstate', disableHistoryNavigation);
   });
   
-  // 初始页面加载时也执行一次
-  document.addEventListener('DOMContentLoaded', function() {
-    // 添加历史状态，以便有状态可以返回
-    history.pushState(null, document.title, location.href);
-  });
+  // // 初始页面加载时也执行一次
+  // document.addEventListener('DOMContentLoaded', function() {
+  //   // 添加历史状态，以便有状态可以返回
+  //   history.pushState(null, document.title, location.href);
+  // });
 })();
