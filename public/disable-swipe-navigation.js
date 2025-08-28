@@ -34,23 +34,31 @@
     }
   }, { passive: false });
   
-  // 处理Astro页面过渡
+  // 添加预加载功能，提高链接跳转速度
   document.addEventListener('astro:page-load', function() {
-    // 重新绑定事件处理程序，确保在页面过渡后仍然有效
-    const disableHistoryNavigation = function(e) {
-      if (e.type === 'popstate') {
-        // 阻止浏览器默认的历史导航行为
-        history.pushState(null, document.title, location.href);
-      }
-    };
-    
-    // 监听popstate事件（浏览器返回按钮或滑动返回触发）
-    window.addEventListener('popstate', disableHistoryNavigation);
-  });
-  
-  // 初始页面加载时也执行一次
-  document.addEventListener('DOMContentLoaded', function() {
-    // 添加历史状态，以便有状态可以返回
-    history.pushState(null, document.title, location.href);
+    // 预加载链接
+    const links = document.querySelectorAll('a[href^="/"]:not([rel="prefetch"])');
+    links.forEach(link => {
+      link.setAttribute('rel', 'prefetch');
+    });
   });
 })();
+// 处理Astro页面过渡
+document.addEventListener('astro:page-load', function() {
+  // 重新绑定事件处理程序，确保在页面过渡后仍然有效
+  const disableHistoryNavigation = function(e) {
+    if (e.type === 'popstate') {
+      // 阻止浏览器默认的历史导航行为
+      history.pushState(null, document.title, location.href);
+    }
+  };
+  
+  // 监听popstate事件（浏览器返回按钮或滑动返回触发）
+  window.addEventListener('popstate', disableHistoryNavigation);
+});
+
+// 初始页面加载时也执行一次
+document.addEventListener('DOMContentLoaded', function() {
+  // 添加历史状态，以便有状态可以返回
+  history.pushState(null, document.title, location.href);
+});
