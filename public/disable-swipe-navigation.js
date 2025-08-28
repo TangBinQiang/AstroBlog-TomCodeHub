@@ -18,16 +18,6 @@
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length > 1) return; // 忽略多点触控
     
-    // 检查触摸事件是否发生在代码块元素上
-    const target = e.target;
-    const isCodeBlock = target.closest('pre') !== null || 
-                        target.closest('code') !== null ||
-                        target.tagName === 'PRE' || 
-                        target.tagName === 'CODE';
-    
-    // 如果是在代码块上，不阻止默认行为，允许正常滚动
-    if (isCodeBlock) return;
-    
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
     const deltaX = currentX - startX;
