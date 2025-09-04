@@ -1,10 +1,10 @@
-// 禁用滑动导航手势
+// 仅禁用向右滑动返回功能
 (function() {
   // 初始触摸位置
   let startX = 0;
   let startY = 0;
   let isScrolling = false;
-  let threshold = 30; // 增加阈值，使检测更精确
+  let threshold = 30; // 滑动阈值
   
   // 监听触摸开始事件
   document.addEventListener('touchstart', function(e) {
@@ -12,7 +12,7 @@
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     isScrolling = false;
-  }, { passive: true }); // 改为passive: true提高性能
+  }, { passive: true }); // 使用passive: true提高性能
   
   // 监听触摸移动事件
   document.addEventListener('touchmove', function(e) {
@@ -33,51 +33,4 @@
       isScrolling = true;
     }
   }, { passive: false });
-  
-  // 预加载链接，提高跳转速度
-  function prefetchLinks() {
-    const links = document.querySelectorAll('a[href^="/"]:not([rel="prefetch"])');
-    if (links.length > 0) {
-      links.forEach(link => {
-        if (!link.href.includes('#') && !link.closest('[data-no-prefetch]')) {
-          link.setAttribute('rel', 'prefetch');
-          
-          // 添加mouseenter事件，当鼠标悬停时预加载
-          link.addEventListener('mouseenter', () => {
-            const prefetcher = document.createElement('link');
-            prefetcher.rel = 'prefetch';
-            prefetcher.href = link.href;
-            document.head.appendChild(prefetcher);
-          }, { once: true });
-        }
-      });
-    }
-  }
-  
-  // 处理Astro页面过渡
-  document.addEventListener('astro:page-load', function() {
-    // 预加载链接
-    prefetchLinks();
-    
-    // 重新绑定事件处理程序，确保在页面过渡后仍然有效
-    const disableHistoryNavigation = function(e) {
-      if (e.type === 'popstate') {
-        // 阻止浏览器默认的历史导航行为
-        history.pushState(null, document.title, location.href);
-      }
-    };
-    
-    // 监听popstate事件（浏览器返回按钮或滑动返回触发）
-    window.removeEventListener('popstate', disableHistoryNavigation); // 先移除旧的监听器
-    window.addEventListener('popstate', disableHistoryNavigation);
-  });
-  
-  // 初始页面加载时也执行一次
-  document.addEventListener('DOMContentLoaded', function() {
-    // 添加历史状态，以便有状态可以返回
-    history.pushState(null, document.title, location.href);
-    
-    // 初始化预加载
-    prefetchLinks();
-  });
 })();
