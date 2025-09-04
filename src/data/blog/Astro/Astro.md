@@ -8,7 +8,7 @@ featured: true
 draft: false
 tags:
   - docs
-description: 创建Astro项目，应用Astro-paper主题
+description: 创建Astro项目，应用Astro-paper主题(该文章代码量过大，文章渲染时间长，跳转速度慢)
 ---
 
 AstroPaper is a highly customizable Astro blog theme. With AstroPaper, you can customize everything according to your personal taste. This article will explain how you can make some customizations easily in the config file.
