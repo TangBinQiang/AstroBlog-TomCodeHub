@@ -12,7 +12,6 @@ import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import site from "@/utils/og-templates/site";
 
 // https://astro.build/config
 export default defineConfig({
