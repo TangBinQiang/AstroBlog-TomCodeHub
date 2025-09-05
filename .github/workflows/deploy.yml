@@ -29,6 +29,7 @@ jobs:
       - run: pnpm run lint || true
       - run: pnpm run format:check || true  
       - run: pnpm run build
+      - run: touch dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
