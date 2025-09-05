@@ -1,0 +1,52 @@
+/* latex.css */
+
+/* KaTeX 主题适配 */
+.katex,
+.katex-display,
+.prose .katex,
+.prose .katex-display {
+  color: var(--color-foreground) !important;
+}
+
+/* 强制所有 KaTeX 子元素继承颜色 */
+.katex *,
+.katex-display *,
+.prose .katex *,
+.prose .katex-display * {
+  color: inherit !important;
+}
+
+/* 针对不同主题的具体处理 */
+html[data-theme="light"] .katex,
+html[data-theme="light"] .katex-display,
+html[data-theme="light"] .prose .katex,
+html[data-theme="light"] .prose .katex-display {
+  color: var(--foreground) !important;
+}
+
+html[data-theme="dark"] .katex,
+html[data-theme="dark"] .katex-display,
+html[data-theme="dark"] .prose .katex,
+html[data-theme="dark"] .prose .katex-display {
+  color: var(--foreground) !important;
+}
+
+/* 确保特殊 KaTeX 元素也继承颜色 */
+.katex .mord,
+.katex .mopen,
+.katex .mclose,
+.katex .mbin,
+.katex .mrel,
+.katex .mpunct,
+.katex .minner,
+.katex .mop,
+.katex-display .mord,
+.katex-display .mopen,
+.katex-display .mclose,
+.katex-display .mbin,
+.katex-display .mrel,
+.katex-display .mpunct,
+.katex-display .minner,
+.katex-display .mop {
+  color: inherit !important;
+}

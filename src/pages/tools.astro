@@ -1,0 +1,130 @@
+---
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+
+// 导入图标
+import ddicon from '@/assets/icons/Icongithub.svg'
+import tenxun from '@/assets/icons/tools/腾讯视频.svg'
+// 图标
+import iconfont from '@/assets/icons/tools/iconfont.svg'
+
+const toolCategories = [
+  {
+    title: "常用工具",
+    tools: [
+      {
+        name: "Can I use",
+        description: "浏览器兼容性查询工具",
+        url: "https://caniuse.com/",
+        icon:  ddicon,
+        bgColor: "bg-green-100",
+      },
+      {
+        icon:  iconfont,
+        name: "TinyPNG",
+        description: "图片压缩工具",
+        url: "https://tinypng.com/",
+        bgColor: "bg-blue-100",
+      },
+      {
+        icon:  ddicon,
+        name: "开发者工具集",
+        description: "前端开发者常用工具和资源",
+        url: "#",
+        bgColor: "bg-yellow-100",
+      },
+      {
+        icon:  tenxun,
+        name: "在线工具",
+        description: "各种实用在线工具",
+        url: "#",
+        bgColor: "bg-red-100",
+      },
+    ],
+  },
+  {
+    title: "AI 导航",
+    tools: [
+      {
+        icon: null,
+        name: "ChatGPT（国际）",
+        description: "OpenAI开发的AI聊天助手",
+        url: "https://chat.openai.com/",
+        bgColor: "bg-green-100",
+      },
+      {
+        icon: null,
+        name: "Notion AI（国际）",
+        description: "Notion集成的AI助手",
+        url: "https://www.notion.so/",
+        bgColor: "bg-blue-100",
+      },
+      {
+        icon: null,
+        name: "Midjourney（国际）",
+        description: "AI图像生成工具",
+        url: "https://www.midjourney.com/",
+        bgColor: "bg-yellow-100",
+      },
+      {
+        icon: null,
+        name: "Beautiful.ai（PPT）",
+        description: "AI驱动的演示文稿创建工具",
+        url: "https://www.beautiful.ai/",
+        bgColor: "bg-red-100",
+      },
+    ],
+  },
+  {
+    title: "图标库",
+    tools: [
+      {
+        icon: iconfont,
+        name: "iconfont",
+        description: "阿里矢量图标库（国内最强）",
+        url: "https://www.iconfont.cn/",
+      }
+    ],
+  },
+];
+---
+
+<Layout title={`工具集 | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle="工具集" pageDesc="实用工具导航">
+    <div class="space-y-8">
+      {toolCategories.map(category => (
+        <div>
+          <h2 class="text-xl font-bold mb-4">{category.title}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {category.tools.map(tool => (
+              <a 
+                href={tool.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class={`border border-border bg-muted/30 p-4 rounded-lg transition-transform hover:scale-105 hover:bg-muted/50`}
+              >
+                <div class="flex items-center gap-2 mb-2">
+                  {tool.icon && <img src={tool.icon.src} alt="" class="w-8 h-8" />}
+                  <div class="font-bold text-lg text-foreground">{tool.name}</div>
+                </div>
+                <div class="text-sm text-foreground/80">{tool.description}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>

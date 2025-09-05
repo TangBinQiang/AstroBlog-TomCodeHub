@@ -1,6 +1,7 @@
 @plugin '@tailwindcss/typography';
 
 @layer base {
+  
   /* ===== Override default Tailwind Typography styles ===== */
   .app-prose {
     @apply prose;
@@ -14,7 +15,7 @@
     }
 
     h3 {
-      @apply italic;
+      @apply not-italic;
     }
 
     p,
