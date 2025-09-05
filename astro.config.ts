@@ -15,7 +15,7 @@ import rehypeKatex from "rehype-katex";
 
 // https://astro.build/config
 export default defineConfig({
-  site: ' https://tangbinqiang.github.io',
+  site: ' https://tangbinqiang.github.io/AstroBlog-TomCodeHub',
   base: '/AstroBlog-TomCodeHub',
   integrations: [
     sitemap({
