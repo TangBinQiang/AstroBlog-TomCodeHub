@@ -1498,7 +1498,7 @@ import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
 ```
 
 ### 配置目录的自带折叠功能
-``` css
+``` css file=./styles/toc.css
 /* 目录样式 */
 /* 文章布局调整为两栏 */
 @media (min-width: 1024px) {
