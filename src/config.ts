@@ -1,7 +1,7 @@
 export const SITE = {
-  website: "https://astroblog-tomcodehub.pages.dev/", // 删除前面的空格
-  author: "Tang Binqiang", // 改为你的名字
-  profile: "https://satnaing.dev/", // 改为你的个人资料页面
+  website: "https://tangbinqiang.github.io/", // 删除前面的空格
+  author: "Tang BinQiang", // 改为你的名字
+  profile: "https://tangbinqiang.github.io/", // 改为你的个人资料页面
   desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
   title: "壶天洞地",
   ogImage: "astropaper-og.jpg",
@@ -14,7 +14,7 @@ export const SITE = {
   editPost: {
     enabled: true,
     text: "Edit page",
-    url: "https://github.com/satnaing/astro-paper/edit/main/",
+    url: "https://github.com/TangBinQiang/TangBinQiang.github.io",
   },
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
