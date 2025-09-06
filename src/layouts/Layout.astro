@@ -3,7 +3,6 @@ import { ClientRouter } from "astro:transitions";
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { SITE } from "@/config";
 import "@/styles/global.css";
-import { withBase } from "@/utils/baseUrl";
 
 export interface Props {
   title?: string;
@@ -131,8 +130,8 @@ const structuredData = {
 
     <ClientRouter />
 
-    <script is:inline src=withbase("/toggle-theme.js")></script>
-    <script is:inline src=withbase("/disable-swipe-navigation.js)"></script>
+    <script is:inline src="/toggle-theme.js"></script>
+    <script is:inline src="/disable-swipe-navigation.js"></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
