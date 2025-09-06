@@ -17,6 +17,10 @@ import rehypeKatex from "rehype-katex";
 export default defineConfig({
   site: 'https://tangbinqiang.github.io',
   base: '/AstroBlog-TomCodeHub',
+  output: 'static',
+  build: {
+    format: 'file', // 临时改为文件格式而不是目录
+  },
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
