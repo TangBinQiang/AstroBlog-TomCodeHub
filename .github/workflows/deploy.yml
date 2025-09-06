@@ -21,6 +21,127 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
+      
+      # 动态配置部署环境
+      - name: Configure deployment environment
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          REPO_OWNER=${{ github.repository_owner }}
+          echo "Repository name: $REPO_NAME"
+          echo "Repository owner: $REPO_OWNER"
+          
+          # 检查是否为 GitHub Pages 部署（用户名.github.io 格式的仓库被认为是自定义域名部署）
+          if [[ "$REPO_NAME" != "$REPO_OWNER.github.io" ]]; then
+            echo "Detected GitHub Pages deployment with base path"
+            echo "DEPLOYMENT_TYPE=github-pages" >> $GITHUB_ENV
+            echo "BASE_PATH=/$REPO_NAME" >> $GITHUB_ENV
+            
+            # 检查并修改 astro.config.mjs 文件
+            if [ -f "astro.config.mjs" ]; then
+              echo "Configuring astro.config.mjs for GitHub Pages with base path"
+              
+              # 备份原始文件
+              cp astro.config.mjs astro.config.mjs.backup
+              
+              # 使用 Node.js 脚本来修改配置（更可靠的方法）
+              cat > modify-config.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          
+          const configPath = 'astro.config.mjs';
+          const basePath = process.env.BASE_PATH;
+          
+          if (fs.existsSync(configPath)) {
+            let content = fs.readFileSync(configPath, 'utf8');
+            
+            // 移除现有的 site 和 base 配置（如果存在）
+            content = content.replace(/site:\s*['"`][^'"`]*['"`],?\s*/g, '');
+            content = content.replace(/base:\s*['"`][^'"`]*['"`],?\s*/g, '');
+            
+            // 在 defineConfig 中添加新的配置
+            if (content.includes('export default defineConfig({')) {
+              content = content.replace(
+                /export default defineConfig\(\{/,
+                `export default defineConfig({
+            site: 'https://${process.env.GITHUB_REPOSITORY_OWNER}.github.io',
+            base: '${basePath}',`
+              );
+            } else if (content.includes('defineConfig({')) {
+              content = content.replace(
+                /defineConfig\(\{/,
+                `defineConfig({
+            site: 'https://${process.env.GITHUB_REPOSITORY_OWNER}.github.io',
+            base: '${basePath}',`
+              );
+            }
+            
+            fs.writeFileSync(configPath, content);
+            console.log('Successfully configured astro.config.mjs for GitHub Pages');
+          } else {
+            console.log('astro.config.mjs not found, skipping configuration');
+          }
+          EOF
+              
+              node modify-config.js
+            else
+              echo "astro.config.mjs not found, creating basic configuration"
+              cat > astro.config.mjs << EOF
+          import { defineConfig } from 'astro/config';
+          
+          export default defineConfig({
+            site: 'https://$REPO_OWNER.github.io',
+            base: '$BASE_PATH',
+          });
+          EOF
+            fi
+          else
+            echo "Detected custom domain deployment (Cloudflare or user.github.io)"
+            echo "DEPLOYMENT_TYPE=custom-domain" >> $GITHUB_ENV
+            echo "BASE_PATH=" >> $GITHUB_ENV
+            
+            # 为自定义域名部署配置（移除 base 配置）
+            if [ -f "astro.config.mjs" ]; then
+              echo "Configuring astro.config.mjs for custom domain deployment"
+              
+              # 备份原始文件
+              cp astro.config.mjs astro.config.mjs.backup
+              
+              # 移除 base 配置，保留或设置 site 配置
+              cat > modify-config.js << 'EOF'
+          const fs = require('fs');
+          
+          const configPath = 'astro.config.mjs';
+          
+          if (fs.existsSync(configPath)) {
+            let content = fs.readFileSync(configPath, 'utf8');
+            
+            // 移除 base 配置
+            content = content.replace(/base:\s*['"`][^'"`]*['"`],?\s*/g, '');
+            
+            // 清理可能的多余逗号和空白
+            content = content.replace(/,\s*,/g, ',');
+            content = content.replace(/{\s*,/g, '{');
+            content = content.replace(/,\s*}/g, '}');
+            
+            fs.writeFileSync(configPath, content);
+            console.log('Successfully configured astro.config.mjs for custom domain');
+          }
+          EOF
+              
+              node modify-config.js
+            fi
+          fi
+          
+          echo "Deployment type: ${{ env.DEPLOYMENT_TYPE || 'Not set' }}"
+          echo "Base path: ${{ env.BASE_PATH || 'Not set' }}"
+      
+      # 显示修改后的配置文件内容（用于调试）
+      - name: Show modified configuration
+        run: |
+          echo "=== Current astro.config.mts ==="
+          cat astro.config.mts || echo "astro.config.mts not found"
+          echo "================================"
+      
       - name: Install, build, and upload your site
         uses: withastro/action@v3
         with:
