@@ -12,14 +12,17 @@ import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import basePathPlugin from "./src/utils/basePathPlugin";
 
 // https://astro.build/config
 export default defineConfig({
-  site: SITE.website,
+  site: 'https://tangbinqiang.github.io',
+  base: '/AstroBlog-TomCodeHub',
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
     }),
+    basePathPlugin(),
   ],
   markdown: {
     remarkPlugins: [
