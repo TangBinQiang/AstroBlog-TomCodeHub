@@ -12,8 +12,10 @@ export default function basePathPlugin(): AstroIntegration {
         // 注入一个全局脚本，用于处理所有链接
         injectScript('page', `
           // 自动为所有链接添加base路径前缀
-          document.addEventListener('DOMContentLoaded', () => {
-            const baseUrl = import.meta.env.BASE_URL || '/';
+            document.addEventListener('DOMContentLoaded', () => {
+            // 获取baseUrl并确保以斜杠结尾
+            let baseUrl = import.meta.env.BASE_URL || '/';
+            baseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
             
             // 处理所有a标签的href属性
             document.querySelectorAll('a[href^="/"]').forEach(link => {

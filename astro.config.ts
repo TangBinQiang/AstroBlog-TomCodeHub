@@ -17,7 +17,7 @@ import basePathPlugin from "./src/utils/basePathPlugin";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://tangbinqiang.github.io',
-  base: '/AstroBlog-TomCodeHub/',
+  base: '/AstroBlog-TomCodeHub',
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
