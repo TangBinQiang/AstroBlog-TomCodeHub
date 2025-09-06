@@ -21,7 +21,12 @@ export function getPath(
     .slice(0, -1) // remove the last segment_ file name_ since it's unnecessary
     .map(segment => slugifyStr(segment)); // slugify each segment path
 
-  const basePath = includeBase ? "/posts" : "";
+  // 获取base URL并确保它不以斜杠结尾
+  const siteBase = import.meta.env.BASE_URL || "";
+  const formattedBase = siteBase.endsWith("/") ? siteBase.slice(0, -1) : siteBase;
+  
+  // 添加posts路径
+  const basePath = includeBase ? `${formattedBase}/posts` : formattedBase;
 
   // Making sure `id` does not contain the directory
   const blogId = id.split("/");
