@@ -16,6 +16,7 @@ import rehypeKatex from "rehype-katex";
 // https://astro.build/config11
 export default defineConfig({
   site: 'https://tangbinqiang.github.io',
+  base: '/',
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
