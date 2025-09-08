@@ -1,0 +1,119 @@
+---
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+import { friendLinks, siteInfo } from "@/data/friends";
+---
+
+<Layout title={`${siteInfo.title} | ${SITE.title}`}>
+  <Header activeNav="friends" />
+  <Main pageTitle={siteInfo.title} pageDesc={siteInfo.description}>
+    <div class="space-y-8">
+      <div>
+        <h2 class="text-xl font-bold mb-4 text-foreground">优秀博客</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {friendLinks.map(friend => (
+            <a 
+              href={friend.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="friend-card group"
+            >
+              {friend.recommended && (
+                <div class="absolute top-2 right-2">
+                  <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
+                    推荐
+                  </span>
+                </div>
+              )}
+              
+              <div class="flex items-start space-x-4">
+                <img
+                  src={friend.avatar}
+                  alt={`${friend.name}'s avatar`}
+                  class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  loading="lazy"
+                />
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-base text-foreground group-hover:text-accent transition-colors">
+                    {friend.name}
+                  </h3>
+                  <p class="text-sm text-foreground/70 mt-1 line-clamp-2">
+                    {friend.description}
+                  </p>
+                  {friend.tags && friend.tags.length > 0 && (
+                    <div class="flex flex-wrap gap-1 mt-2">
+                      {friend.tags.slice(0, 3).map(tag => (
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs text-foreground/60 bg-muted/50 rounded">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-12 p-6 bg-muted/20 rounded-lg">
+        <h3 class="text-lg font-semibold mb-3 text-foreground">交换友链</h3>
+        <p class="text-foreground/80 mb-4">
+          如果你也想加入这个列表，欢迎与我交换友链。基本要求：
+        </p>
+        <ul class="text-sm text-foreground/70 space-y-1 mb-4">
+          <li>• 网站内容健康积极，无违法违规内容</li>
+          <li>• 原创优质内容，更新频率稳定</li>
+          <li>• 网站可正常访问，无恶意广告</li>
+        </ul>
+        <p class="text-sm text-foreground/70">
+          请通过邮件联系我：your-email@example.com
+        </p>
+      </div>
+    </div>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .friend-card {
+    position: relative;
+    border: 1px solid var(--color-border);
+    background: var(--color-card-bg);
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .friend-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .friend-card {
+      padding: 1rem;
+    }
+    
+    .friend-card img {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+</style>
