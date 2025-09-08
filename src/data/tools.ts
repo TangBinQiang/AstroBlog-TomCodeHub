@@ -24,7 +24,7 @@ import icons8 from '../assets/icons/tools/icons8.svg'
 
 //编程
 import react from '../assets/icons/tools/dev/react.svg'
-import vue from '../assets/icons/tools/dev/vue.svg'
+import vue from '../assets/icons/tools/dev/Vue.svg'
 import IT工具 from '../assets/icons/tools/IT工具.svg'
 
 export interface Tool {
