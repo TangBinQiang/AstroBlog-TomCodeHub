@@ -524,7 +524,7 @@ function generateRotations(count: number): number[] {
   }
 
   .viewer-nav {
-    position: absolute;
+    position: fixed;
     top: 50%;
     transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.1);
@@ -586,11 +586,13 @@ function generateRotations(count: number): number[] {
   }
 
   .viewer-prev {
-    left: 20px;
+    left: -20px;
+    margin-left: 40px;
   }
 
   .viewer-next {
-    right: 20px;
+    right: -20px;
+    margin-right: 40px;
   }
 
   .viewer-info {
@@ -633,11 +635,13 @@ function generateRotations(count: number): number[] {
     }
     
     .viewer-prev {
-      left: 15px;
+      left: -15px;
+      margin-left: 30px;
     }
     
     .viewer-next {
-      right: 15px;
+      right: -15px;
+      margin-right: 30px;
     }
     
     .viewer-close {
@@ -674,11 +678,13 @@ function generateRotations(count: number): number[] {
     }
 
     .viewer-prev {
-      left: 10px;
+      left: -10px;
+      margin-left: 25px;
     }
     
     .viewer-next {
-      right: 10px;
+      right: -10px;
+      margin-right: 25px;
     }
 
     .viewer-close {
