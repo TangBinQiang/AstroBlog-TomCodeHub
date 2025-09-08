@@ -11,16 +11,43 @@ import { toolCategories } from "../data/tools";
   <Header />
   <Main pageTitle="工具集" pageDesc="实用工具导航">
     <div class="space-y-8">
-      {toolCategories.map(category => (
-        <div>
+      {toolCategories.map((category, index) => {
+        const uniqueCategoryId = `${category.title}-${index}`;
+        return (
+        <div class="space-y-6" data-category-container={uniqueCategoryId}>
           <h2 class="text-xl font-bold mb-4">{category.title}</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* 二级目录导航 */}
+          {category.subCategories && category.subCategories.length > 0 && (
+            <nav class="flex flex-wrap gap-2 mb-4" aria-label={`${category.title}分类导航`}>
+              <button 
+                class="subcategory-btn px-3 py-1.5 text-sm font-medium rounded-md border border-border bg-transparent text-foreground transition-all duration-200 hover:bg-muted/50"
+                data-category={uniqueCategoryId}
+                data-subcategory="all"
+                aria-label={`查看全部${category.title}工具`}
+              >
+                全部
+              </button>
+              {category.subCategories.map(subCategory => (
+                <button 
+                  class="subcategory-btn px-3 py-1.5 text-sm font-medium rounded-md border border-border bg-transparent text-foreground transition-all duration-200 hover:bg-muted/50"
+                  data-category={uniqueCategoryId}
+                  data-subcategory={subCategory}
+                  aria-label={`查看${subCategory}工具`}
+                >
+                  {subCategory}
+                </button>
+              ))}
+            </nav>
+          )}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 tool-grid" data-category={uniqueCategoryId}>
             {category.tools.map(tool => (
               <a 
                 href={tool.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                class={`relative border border-border bg-muted/30 p-4 rounded-lg transition-transform hover:scale-105 hover:bg-muted/50`}
+                class="relative border border-border bg-muted/30 p-4 rounded-lg transition-transform hover:scale-105 hover:bg-muted/50 tool-item"
+                data-subcategory={tool.subCategory || 'all'}
+                data-category={uniqueCategoryId}
               >
                 {tool.recommended && (
                   <div class="absolute top-0 right-0">
@@ -33,7 +60,7 @@ import { toolCategories } from "../data/tools";
                   </div>
                 )}
                 <div class="flex items-center gap-2 mb-2">
-                  {tool.icon && <img src={tool.icon.src} alt="" class="w-8 h-8" />}
+                  {tool.icon && tool.icon.src && <img src={tool.icon.src} alt="" class="w-8 h-8" />}
                   <div class="font-bold text-lg text-foreground">{tool.name}</div>
                 </div>
                 <div class="text-sm text-foreground/80">{tool.description}</div>
@@ -41,7 +68,7 @@ import { toolCategories } from "../data/tools";
             ))}
           </div>
         </div>
-      ))}
+      )})}
     </div>
   </Main>
   <Footer />
@@ -53,3 +80,70 @@ import { toolCategories } from "../data/tools";
     color: inherit;
   }
 </style>
+
+<script is:inline>
+      // 二级目录导航功能 - 确保页面加载完成后执行
+      function initSubcategoryFilter() {
+        const buttons = document.querySelectorAll('.subcategory-btn');
+        if (buttons.length === 0) return;
+        
+        console.log('初始化子类别筛选功能');
+        
+        // 获取所有唯一的分类
+        const categories = [...new Set(Array.from(buttons).map(btn => btn.dataset.category))];
+        
+        categories.forEach(function(category) {
+          const categoryButtons = Array.from(document.querySelectorAll('.subcategory-btn[data-category="' + category + '"]'));
+          const items = Array.from(document.querySelectorAll('.tool-grid[data-category="' + category + '"] .tool-item'));
+          
+          function setActive(activeBtn) {
+            categoryButtons.forEach(function(btn) {
+              const isActive = btn === activeBtn;
+              btn.classList.toggle('bg-muted', isActive);
+              btn.classList.toggle('border-muted-foreground', isActive);
+              btn.classList.toggle('bg-transparent', !isActive);
+              btn.classList.toggle('border-border', !isActive);
+            });
+          }
+          
+          function filterItems(sub) {
+            items.forEach(function(element) {
+              const itemSub = element.dataset.subcategory || 'all';
+              element.style.display = (sub === 'all' || itemSub === sub) ? '' : 'none';
+            });
+          }
+          
+          // 初始化
+          const allBtn = categoryButtons.find(function(btn) {
+            return btn.dataset.subcategory === 'all';
+          });
+          
+          if (allBtn) {
+            setActive(allBtn);
+            filterItems('all');
+          }
+          
+          // 绑定事件 - 确保每个分类独立处理
+          categoryButtons.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              const btnCategory = btn.dataset.category;
+              if (btnCategory === category) {
+                setActive(btn);
+                filterItems(btn.dataset.subcategory || 'all');
+              }
+            });
+          });
+        });
+      }
+      
+      // 多种方式确保初始化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSubcategoryFilter);
+      } else {
+        initSubcategoryFilter();
+      }
+      
+      // 处理 Astro 视图转换
+      document.addEventListener('astro:page-load', initSubcategoryFilter);
+    </script>

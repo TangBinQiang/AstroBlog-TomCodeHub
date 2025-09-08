@@ -1,5 +1,5 @@
 export const SITE = {
-  website: "https://tangbinqiang.github.io/", // 删除前面的空格
+  website: "https://astroblog-tomcodehub.pages.dev/", // 删除前面的空格
   author: "Tang BinQiang", // 改为你的名字
   profile: "https://tangbinqiang.github.io/", // 改为你的个人资料页面
   desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
