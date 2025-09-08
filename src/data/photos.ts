@@ -17,6 +17,7 @@ export const photoEntries: PhotoEntry[] = [
       "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+      "https://tse4.mm.bing.net/th/id/OIP.AwZqdhNoq0qMyOh3iGDWwwHaNK?r=0&cb=thfvnext&rs=1&pid=ImgDetMain&o=7&rm=3"
     ],
   },
   {
