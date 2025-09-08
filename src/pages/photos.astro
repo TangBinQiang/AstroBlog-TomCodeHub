@@ -1,0 +1,818 @@
+---
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+
+import { photoEntries } from "../data/photos";
+
+// 生成随机旋转角度
+function generateRotations(count: number): number[] {
+  return Array.from({ length: count }, () => (Math.random() - 0.5) * 20);
+}
+---
+
+<Layout title={`Photos | ${SITE.title}`}>
+  <Header activeNav="photos" />
+  <Main pageTitle="Photos" pageDesc="Here I will record some photos taken in daily life.">
+    <div class="photos-container">
+      <div class="timeline">
+        {photoEntries.map((entry, entryIndex) => {
+          const rotations = generateRotations(entry.photos.length);
+          return (
+            <div class="timeline-item" style={`animation-delay: ${entryIndex * 0.2}s`}>
+              <div class="timeline-marker">
+                <span class="timeline-icon">{entry.icon}</span>
+              </div>
+              
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <h3 class="timeline-title">{entry.title}</h3>
+                  <time class="timeline-date">{entry.date}</time>
+                </div>
+                {entry.description && (
+                  <p class="timeline-description">{entry.description}</p>
+                )}
+                
+                <div class="photo-grid">
+                  {entry.photos.map((photo, photoIndex) => (
+                    <button
+                      class="photo-card"
+                      style={`--rotation: ${rotations[photoIndex]}deg`}
+                      data-src={photo}
+                      aria-label={`View photo ${photoIndex + 1}`}
+                    >
+                      <img src={photo} alt={`Photo ${photoIndex + 1}`} loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </Main>
+  <Footer />
+
+  <!-- 优雅图片查看器 -->
+  <div id="photo-viewer" class="photo-viewer" aria-hidden="true">
+    <div class="viewer-backdrop"></div>
+    <div class="viewer-content">
+      <button class="viewer-close" aria-label="Close photo viewer">&times;</button>
+      
+      <div class="viewer-wrapper">
+        <button class="viewer-nav viewer-prev" aria-label="Previous photo">&lsaquo;</button>
+        <img class="viewer-image" src="" alt="" />
+        <button class="viewer-nav viewer-next" aria-label="Next photo">&rsaquo;</button>
+      </div>
+      
+      <div class="viewer-info">
+        <span class="viewer-counter"></span>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* 基础样式 */
+  .photos-container {
+    margin: 0 auto;
+    padding: 1rem 0.5rem;
+  }
+
+  /* 时间线样式 */
+  .timeline {
+    position: relative;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: -3rem;
+    width: 2px;
+    background: var(--color-border);
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  .timeline-item:last-child::before {
+    display: none;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: 20px;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 1;
+    transform: translateX(-50%);
+  }
+
+  .timeline-content {
+    margin-left: 55px;
+    margin-right: 0;
+    width: calc(100% - 55px);
+  }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .timeline-date {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .timeline-description {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  /* 照片网格样式 */
+  .photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .photo-card {
+    position: relative;
+    width: 110px;
+    height: 82px;
+    background: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: rotate(var(--rotation));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-left: -18px;
+  }
+
+  .photo-card:first-child {
+    margin-left: 0;
+  }
+
+  .photo-card:hover {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+
+  .photo-card:not(:hover) {
+    animation: photoRestoreBounce 0.8s ease-out forwards;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .timeline-item::before {
+      left: 20px;
+    }
+
+    .timeline-marker {
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+
+    .timeline-content {
+      margin-left: 55px;
+      margin-right: 0;
+      width: calc(100% - 55px);
+    }
+
+    .timeline-header {
+      flex-direction: column;
+    }
+
+    .photo-card {
+      width: 90px;
+      height: 68px;
+      margin-left: 0;
+    }
+
+    .photo-card:not(:hover) {
+      animation: photoRestoreBounceSmall 0.8s ease-out forwards;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .photos-container {
+      padding: 0.75rem 0.5rem;
+    }
+
+    .timeline-item::before {
+      left: 20px;
+    }
+
+    .timeline-marker {
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+
+    .timeline-content {
+      margin-left: 55px;
+      margin-right: 0;
+      width: calc(100% - 55px);
+    }
+
+    .photo-card {
+      width: 75px;
+      height: 56px;
+      margin-left: 0;
+    }
+
+    .photo-card:not(:hover) {
+      animation: photoRestoreBounceSmall 0.8s ease-out forwards;
+    }
+  }
+
+  .photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .photo-card:hover img {
+    transform: scale(1.1);
+  }
+
+  /* 优雅图片查看器 */
+  .photo-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .photo-viewer.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .viewer-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+  }
+
+  .photo-viewer.active .viewer-backdrop {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .viewer-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .viewer-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  .viewer-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: zoomIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+
+  /* 照片恢复原位弹跳动画 */
+  @keyframes photoRestoreBounce {
+    0% {
+      transform: rotate(0deg) scale(1.05);
+    }
+    15% {
+      transform: rotate(calc(var(--rotation) * 0.3)) scale(1.02);
+    }
+    30% {
+      transform: rotate(calc(var(--rotation) * 0.7)) scale(1.08) translateY(-3px);
+    }
+    50% {
+      transform: rotate(calc(var(--rotation) * 0.9)) scale(1.03) translateY(1px);
+    }
+    70% {
+      transform: rotate(calc(var(--rotation) * 1.05)) scale(1.06) translateY(-1px);
+    }
+    85% {
+      transform: rotate(calc(var(--rotation) * 0.98)) scale(1.01) translateY(0.5px);
+    }
+    100% {
+      transform: rotate(var(--rotation)) scale(1) translateY(0px);
+    }
+  }
+
+  @keyframes photoRestoreBounceSmall {
+    0% {
+      transform: rotate(0deg) scale(1.05);
+    }
+    15% {
+      transform: rotate(calc(var(--rotation) * 0.3)) scale(1.01);
+    }
+    30% {
+      transform: rotate(calc(var(--rotation) * 0.7)) scale(1.04) translateY(-2px);
+    }
+    50% {
+      transform: rotate(calc(var(--rotation) * 0.9)) scale(1.02) translateY(1px);
+    }
+    70% {
+      transform: rotate(calc(var(--rotation) * 1.05)) scale(1.03) translateY(-0.5px);
+    }
+    85% {
+      transform: rotate(calc(var(--rotation) * 0.98)) scale(1.01) translateY(0.3px);
+    }
+    100% {
+      transform: rotate(var(--rotation)) scale(1) translateY(0px);
+    }
+  }
+
+  .viewer-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .viewer-close::before,
+  .viewer-close::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .viewer-close::before {
+    transform: rotate(45deg);
+  }
+
+  .viewer-close::after {
+    transform: rotate(-45deg);
+  }
+
+  .viewer-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.08) rotate(90deg);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  }
+
+  .viewer-close:hover::before,
+  .viewer-close:hover::after {
+    width: 22px;
+    background: #ffffff;
+  }
+
+  .viewer-close:active {
+    transform: scale(0.95) rotate(90deg);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .viewer-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    overflow: hidden;
+  }
+
+  .viewer-nav::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .viewer-prev::before {
+    border-width: 8px 12px 8px 0;
+    border-color: transparent white transparent transparent;
+    margin-right: 2px;
+  }
+
+  .viewer-next::before {
+    border-width: 8px 0 8px 12px;
+    border-color: transparent transparent transparent white;
+    margin-left: 2px;
+  }
+
+  .viewer-nav:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  }
+
+  .viewer-nav:hover::before {
+    border-color: transparent #ffffff transparent transparent;
+  }
+
+  .viewer-next:hover::before {
+    border-color: transparent transparent transparent #ffffff;
+  }
+
+  .viewer-nav:active {
+    transform: translateY(-50%) scale(0.95);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .viewer-prev {
+    left: 20px;
+  }
+
+  .viewer-next {
+    right: 20px;
+  }
+
+  .viewer-info {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 1rem;
+    opacity: 0.8;
+    z-index: 1001;
+  }
+
+  .viewer-counter {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 24px;
+    backdrop-filter: blur(12px);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .viewer-counter:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  }
+
+  /* 响应式导航按钮 */
+  @media (max-width: 768px) {
+    .viewer-nav {
+      width: 44px;
+      height: 44px;
+    }
+    
+    .viewer-prev {
+      left: 15px;
+    }
+    
+    .viewer-next {
+      right: 15px;
+    }
+    
+    .viewer-close {
+      top: 15px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+    }
+
+    .viewer-close::before,
+    .viewer-close::after {
+      width: 18px;
+    }
+
+    .viewer-close:hover::before,
+    .viewer-close:hover::after {
+      width: 20px;
+    }
+
+    .viewer-prev::before {
+      border-width: 7px 10px 7px 0;
+    }
+
+    .viewer-next::before {
+      border-width: 7px 0 7px 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .viewer-nav,
+    .viewer-close {
+      width: 40px;
+      height: 40px;
+    }
+
+    .viewer-prev {
+      left: 10px;
+    }
+    
+    .viewer-next {
+      right: 10px;
+    }
+
+    .viewer-close {
+      top: 10px;
+      right: 15px;
+    }
+
+    .viewer-close::before,
+    .viewer-close::after {
+      width: 16px;
+    }
+
+    .viewer-prev::before {
+      border-width: 6px 8px 6px 0;
+    }
+
+    .viewer-next::before {
+      border-width: 6px 0 6px 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .photos-container {
+      padding: 1rem;
+    }
+
+    .photo-card {
+      width: 85px;
+      height: 64px;
+      margin-left: -12px;
+    }
+  }
+
+  /* 动画 */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+      box-shadow: 0 6px 30px rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* 深色模式适配 */
+  :global(.dark) .photo-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+  }
+
+  :global(.dark) .timeline-marker {
+    background: #1a1a1a;
+    border-color: #333;
+  }
+</style>
+
+<script>
+  // 优雅图片查看器
+  function initPhotoViewer() {
+    const photoCards = document.querySelectorAll('.photo-card');
+    const viewer = document.getElementById('photo-viewer');
+    const viewerImage = viewer?.querySelector('.viewer-image') as HTMLImageElement | null;
+    const viewerClose = viewer?.querySelector('.viewer-close') as HTMLButtonElement | null;
+    const viewerPrev = viewer?.querySelector('.viewer-prev') as HTMLButtonElement | null;
+    const viewerNext = viewer?.querySelector('.viewer-next') as HTMLButtonElement | null;
+    const viewerCounter = viewer?.querySelector('.viewer-counter') as HTMLSpanElement | null;
+    const viewerBackdrop = viewer?.querySelector('.viewer-backdrop') as HTMLDivElement | null;
+
+    if (!viewer || !viewerImage) return;
+
+    let currentGroup: string[] = [];
+    let currentIndex = 0;
+
+    // 为每个照片卡片添加点击事件
+    photoCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const timelineItem = card.closest('.timeline-item');
+        if (!timelineItem) return;
+        
+        const groupPhotos = Array.from(timelineItem.querySelectorAll('.photo-card'));
+        currentGroup = groupPhotos.map(photo => photo.getAttribute('data-src') || '').filter(src => src);
+        currentIndex = groupPhotos.indexOf(card);
+        
+        if (currentGroup.length > 0) {
+          showImage();
+          viewer.classList.add('active');
+          viewer.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+
+    function showImage() {
+      if (!viewerImage || !viewerCounter) return;
+      
+      viewerImage.src = currentGroup[currentIndex];
+      viewerCounter.textContent = `${currentIndex + 1} / ${currentGroup.length}`;
+      
+      // 显示/隐藏导航按钮
+      if (viewerPrev) {
+        viewerPrev.style.display = currentGroup.length > 1 ? 'flex' : 'none';
+      }
+      if (viewerNext) {
+        viewerNext.style.display = currentGroup.length > 1 ? 'flex' : 'none';
+      }
+    }
+
+    function prevImage() {
+      if (currentGroup.length <= 1) return;
+      currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
+      showImage();
+    }
+
+    function nextImage() {
+      if (currentGroup.length <= 1) return;
+      currentIndex = (currentIndex + 1) % currentGroup.length;
+      showImage();
+    }
+
+    function closeViewer() {
+      if (!viewer) return;
+      viewer.classList.remove('active');
+      viewer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // 事件监听
+    if (viewerClose) {
+      viewerClose.addEventListener('click', closeViewer);
+    }
+    if (viewerBackdrop) {
+      viewerBackdrop.addEventListener('click', closeViewer);
+    }
+    if (viewerPrev) {
+      viewerPrev.addEventListener('click', prevImage);
+    }
+    if (viewerNext) {
+      viewerNext.addEventListener('click', nextImage);
+    }
+
+    // 键盘控制
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (!viewer || !viewer.classList.contains('active')) return;
+      
+      switch (e.key) {
+        case 'Escape':
+          closeViewer();
+          break;
+        case 'ArrowLeft':
+          prevImage();
+          break;
+        case 'ArrowRight':
+          nextImage();
+          break;
+      }
+    });
+
+    // 触摸手势支持
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    viewer.addEventListener('touchstart', (e: TouchEvent) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    viewer.addEventListener('touchend', (e: TouchEvent) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      if (touchEndX < touchStartX - 50) {
+        nextImage();
+      }
+      if (touchEndX > touchStartX + 50) {
+        prevImage();
+      }
+    }
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', initPhotoViewer);
+  document.addEventListener('astro:page-load', initPhotoViewer);
+</script>
