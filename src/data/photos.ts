@@ -20,6 +20,18 @@ export const photoEntries: PhotoEntry[] = [
     ],
   },
   {
+    icon: "🐱",
+    title: "Friend's Adorable Cat",
+    date: "2025-06-21",
+    description: "So kawaii (*^ω^*)",
+    photos: [
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+    ],
+  },
+  {
     icon: "🌅",
     title: "Ningbo · Dongqian Lake",
     date: "2025-03-01",

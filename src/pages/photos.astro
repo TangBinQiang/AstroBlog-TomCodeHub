@@ -78,8 +78,8 @@ function generateRotations(count: number): number[] {
 <style>
   /* 基础样式 */
   .photos-container {
-    margin: 0 auto;
-    padding: 1rem 0.5rem;
+    margin: 0;
+    padding: 0;
   }
 
   /* 时间线样式 */
@@ -97,13 +97,14 @@ function generateRotations(count: number): number[] {
   .timeline-item::before {
     content: '';
     position: absolute;
-    left: 19px;
-    top: 0;
-    bottom: -3rem;
+    left: 20px;
+    top: 40px;
+    bottom: -2rem;
     width: 2px;
     background: var(--color-border);
     opacity: 0.3;
     z-index: 0;
+    transform: translateX(-50%);
   }
 
   .timeline-item:last-child::before {
@@ -112,25 +113,33 @@ function generateRotations(count: number): number[] {
 
   .timeline-marker {
     position: absolute;
-    left: 20px;
-    top: 0;
+    left: 0;
+    top: -0.5rem;
     width: 40px;
     height: 40px;
-    background: var(--color-bg);
-    border: 2px solid var(--color-border);
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     z-index: 1;
-    transform: translateX(-50%);
   }
+  
+  .timeline-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: transparent;
+      width: 40px;
+      height: 40px;
+      border: none;
+      box-shadow: none;
+    }
 
   .timeline-content {
-    margin-left: 55px;
+    margin-left: 60px;
     margin-right: 0;
-    width: calc(100% - 55px);
+    margin-top: 0;
+    width: calc(100% - 60px);
   }
 
   .timeline-header {
@@ -164,30 +173,31 @@ function generateRotations(count: number): number[] {
   .photo-grid {
     display: flex;
     flex-wrap: wrap;
+    margin-left: 25px; /* 使照片组与上面文字左对齐 */
   }
 
-  .photo-card {
-    position: relative;
-    width: 110px;
-    height: 82px;
-    background: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    transform: rotate(var(--rotation));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-left: -18px;
-  }
+  .photo-card {    position: relative;    width: 105px;    height: 130px;    background: white;    border: 1px solid #e0e0e0;    border-radius: 2px;    cursor: pointer;    overflow: hidden;    transition: all 0.3s ease;    transform: rotate(var(--rotation));    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 4px rgba(0, 0, 0, 0.05);    margin-left: -22px;    z-index: 1;  }
 
-  .photo-card:first-child {
-    margin-left: 0;
-  }
+  /* 拍立得相纸效果和噪点纹理 */
+  .photo-card::before {    content: '';    position: absolute;    top: 0;    left: 0;    right: 0;    bottom: 0;    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJub2lzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iNCIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iMC4wMyIvPjwvc3ZnPg==');    opacity: 0.2;    z-index: 3;    pointer-events: none;  }
+
+  .photo-card::after {    content: '';    position: absolute;    bottom: 0;    left: 0;    right: 0;    height: 25px;    background: linear-gradient(0deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0) 100%);    z-index: 2;  }
+
+  /* 设置左边照片叠在右边照片上的z-index */
+  .photo-card:nth-child(1) { z-index: 10; }
+  .photo-card:nth-child(2) { z-index: 9; }
+  .photo-card:nth-child(3) { z-index: 8; }
+  .photo-card:nth-child(4) { z-index: 7; }
+  .photo-card:nth-child(5) { z-index: 6; }
+  .photo-card:nth-child(6) { z-index: 5; }
+  .photo-card:nth-child(7) { z-index: 4; }
+  .photo-card:nth-child(8) { z-index: 3; }
+  .photo-card:nth-child(9) { z-index: 2; }
+  .photo-card:nth-child(10) { z-index: 1; }
 
   .photo-card:hover {
-    transform: rotate(0deg) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: rotate(0deg) scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 4px rgba(0, 0, 0, 0.1);
     z-index: 10;
   }
 
@@ -199,29 +209,62 @@ function generateRotations(count: number): number[] {
   @media (max-width: 768px) {
     .timeline-item::before {
       left: 20px;
+      top: 40px;
     }
 
     .timeline-marker {
       left: 20px;
+      top: -0.5rem;
       width: 40px;
       height: 40px;
-      font-size: 1.2rem;
+      transform: translateX(-50%);
     }
 
+    .timeline-icon {
+        font-size: 1.25rem;
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+      }
+
     .timeline-content {
-      margin-left: 55px;
+      margin-left: 60px;
       margin-right: 0;
-      width: calc(100% - 55px);
+      width: calc(100% - 60px);
     }
 
     .timeline-header {
       flex-direction: column;
     }
 
+    .photo-grid {
+      margin-left: 22px; /* 响应式布局中照片组与上面文字左对齐 */
+    }
+    
     .photo-card {
       width: 90px;
-      height: 68px;
-      margin-left: 0;
+      height: 110px;
+      margin-left: -18px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 响应式布局中设置左边照片叠在右边照片上的z-index */
+    .photo-card:nth-child(1) { z-index: 10; }
+    .photo-card:nth-child(2) { z-index: 9; }
+    .photo-card:nth-child(3) { z-index: 8; }
+    .photo-card:nth-child(4) { z-index: 7; }
+    .photo-card:nth-child(5) { z-index: 6; }
+    .photo-card:nth-child(6) { z-index: 5; }
+    .photo-card:nth-child(7) { z-index: 4; }
+    .photo-card:nth-child(8) { z-index: 3; }
+    .photo-card:nth-child(9) { z-index: 2; }
+    .photo-card:nth-child(10) { z-index: 1; }
+
+    .photo-card:hover {
+      transform: rotate(0deg) scale(1.08);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 3px rgba(0, 0, 0, 0.1);
     }
 
     .photo-card:not(:hover) {
@@ -236,13 +279,21 @@ function generateRotations(count: number): number[] {
 
     .timeline-item::before {
       left: 20px;
+      top: 40px;
     }
 
     .timeline-marker {
       left: 20px;
+      top: -0.6rem;
       width: 40px;
       height: 40px;
-      font-size: 1.2rem;
+      transform: translateX(-50%);
+    }
+
+    .timeline-icon {
+      font-size: 1.25rem;
+      width: 36px;
+      height: 36px;
     }
 
     .timeline-content {
@@ -251,10 +302,32 @@ function generateRotations(count: number): number[] {
       width: calc(100% - 55px);
     }
 
+    .photo-grid {
+      margin-left: 18px; /* 移动端布局中照片组与上面文字左对齐 */
+    }
+    
     .photo-card {
       width: 75px;
-      height: 56px;
-      margin-left: 0;
+      height: 95px;
+      margin-left: -12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 响应式布局中设置左边照片叠在右边照片上的z-index */
+    .photo-card:nth-child(1) { z-index: 10; }
+    .photo-card:nth-child(2) { z-index: 9; }
+    .photo-card:nth-child(3) { z-index: 8; }
+    .photo-card:nth-child(4) { z-index: 7; }
+    .photo-card:nth-child(5) { z-index: 6; }
+    .photo-card:nth-child(6) { z-index: 5; }
+    .photo-card:nth-child(7) { z-index: 4; }
+    .photo-card:nth-child(8) { z-index: 3; }
+    .photo-card:nth-child(9) { z-index: 2; }
+    .photo-card:nth-child(10) { z-index: 1; }
+
+    .photo-card:hover {
+      transform: rotate(0deg) scale(1.06);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(0, 0, 0, 0.1);
     }
 
     .photo-card:not(:hover) {
@@ -263,11 +336,15 @@ function generateRotations(count: number): number[] {
   }
 
   .photo-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      filter: saturate(1.1) contrast(1.05);
+      image-rendering: auto;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
 
   .photo-card:hover img {
     transform: scale(1.1);
@@ -628,11 +705,19 @@ function generateRotations(count: number): number[] {
       padding: 1rem;
     }
 
-    .photo-card {
-      width: 85px;
-      height: 64px;
-      margin-left: -12px;
-    }
+    .photo-card {      width: 75px;      height: 95px;      margin-left: -12px;    }
+
+    /* 响应式布局中设置左边照片叠在右边照片上的z-index */
+    .photo-card:nth-child(1) { z-index: 10; }
+    .photo-card:nth-child(2) { z-index: 9; }
+    .photo-card:nth-child(3) { z-index: 8; }
+    .photo-card:nth-child(4) { z-index: 7; }
+    .photo-card:nth-child(5) { z-index: 6; }
+    .photo-card:nth-child(6) { z-index: 5; }
+    .photo-card:nth-child(7) { z-index: 4; }
+    .photo-card:nth-child(8) { z-index: 3; }
+    .photo-card:nth-child(9) { z-index: 2; }
+    .photo-card:nth-child(10) { z-index: 1; }
   }
 
   /* 动画 */
@@ -680,6 +765,33 @@ function generateRotations(count: number): number[] {
   :global(.dark) .photo-card {
     background: #1a1a1a;
     border: 1px solid #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(30, 30, 30, 0.8), 0 0 0 4px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.dark) .photo-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(30, 30, 30, 0.8), 0 0 0 4px rgba(0, 0, 0, 0.4);
+  }
+
+  :global(.dark) .photo-card img {
+    filter: saturate(1.1) contrast(1.1);
+  }
+
+  /* 为查看器中的图片也添加拍立得效果 */
+  .viewer-image {
+    position: relative;
+  }
+
+  .viewer-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJub2lzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iNCIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iMC4wMyIvPjwvc3ZnPg==');
+    opacity: 0.2;
+    z-index: 1;
+    pointer-events: none;
   }
 
   :global(.dark) .timeline-marker {
