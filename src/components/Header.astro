@@ -6,6 +6,7 @@ import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconArchive from "@/assets/icons/IconArchive.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
+import IconChevronDown from "@/assets/icons/IconChevronDown.svg";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config"
 
@@ -21,6 +22,25 @@ const isActive = (path: string) => {
 
   return currentPath === path || currentPathArray[0] === pathArray[0];
 };
+
+// 导航菜单配置
+const navItems = [
+  { title: "笔记", href: "/posts", subItems: [
+    { title: "技术文章", href: "/posts/tech" },
+    { title: "生活随笔", href: "/posts/life" },
+    { title: "学习笔记", href: "/posts/notes" }
+  ]},
+  { title: "标签", href: "/tags" },
+  { title: "项目", href: "/projects", subItems: [
+    { title: "前端项目", href: "/projects/frontend" },
+    { title: "后端项目", href: "/projects/backend" },
+    { title: "工具开发", href: "/projects/tools" }
+  ]},
+  { title: "工具集", href: "/tools" },
+  { title: "时光", href: "/photos" },
+  { title: "朋友们", href: "/friends" },
+  { title: "关于", href: "/about" }
+];
 ---
 
 <header>
@@ -63,46 +83,67 @@ const isActive = (path: string) => {
           id="menu-items"
           class:list={[
             "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-            "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
+            "[&>li]:text-center [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
             "hidden",
             "sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
+            "sm:items-center",
           ]}
         >
-          <li class="col-span-2">
-            <a href="/posts" class:list={{ "active-nav": isActive("/posts") }}>
-              笔记
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/tags" class:list={{ "active-nav": isActive("/tags") }}>
-              标签
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/about" class:list={{ "active-nav": isActive("/about") }}>
-              关于
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/photos" class:list={{ "active-nav": isActive("/timeline") }}>
-              时光
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/projects" class:list={{ "active-nav": isActive("/projects") }}>
-              项目
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/tools" class:list={{ "active-nav": isActive("/tools") }}>
-              工具集
-            </a>
-          </li>
-          <li class="col-span-2">
-            <a href="/friends" class:list={{ "active-nav": isActive("/friends") }}>
-              朋友们
-            </a>
-          </li>
+          {navItems.map((item) => (
+            <li class:list={[
+              "col-span-2 relative group",
+              { "sm:relative": item.subItems }
+            ]}>
+              {item.subItems ? (
+                <button
+                  class="w-full flex items-center justify-center gap-1 hover:text-accent focus:outline-none"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                >
+                  <span>{item.title}</span>
+                  <IconChevronDown class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90" />
+                </button>
+              ) : (
+                <a
+                  href={item.href}
+                  class:list={[
+                    "block text-center",
+                    { "active-nav": isActive(item.href) }
+                  ]}
+                >
+                  {item.title}
+                </a>
+              )}
+              
+              {item.subItems && (
+                <ul
+                  class:list={[
+                    "absolute left-0 mt-2 min-w-max origin-top-left rounded-md bg-background shadow-lg ring-1 ring-border focus:outline-none",
+                    "opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200",
+                    "sm:left-0 sm:right-auto sm:origin-top-left",
+                    "hidden sm:block",
+                    "z-50"
+                  ]}
+                  role="menu"
+                  aria-orientation="vertical"
+                  tabindex="-1"
+                >
+                  {item.subItems.map((subItem) => (
+                    <li role="none">
+                      <a
+                        href={subItem.href}
+                        class="block px-4 py-2 text-sm text-center text-foreground hover:bg-muted hover:text-accent"
+                        role="menuitem"
+                        tabindex="-1"
+                      >
+                        {subItem.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
           {
             SITE.showArchives && (
               <li class="col-span-2">
@@ -147,8 +188,8 @@ const isActive = (path: string) => {
                   aria-label="auto"
                   aria-live="polite"
                 >
-                  <IconMoon class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                  <IconSunHigh class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                  <IconMoon class="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] scale-100 transition-all dark:scale-0" />
+                  <IconSunHigh class="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] scale-0 transition-all dark:scale-100" />
                 </button>
               </li>
             )
@@ -159,6 +200,69 @@ const isActive = (path: string) => {
   </div>
   <Hr />
 </header>
+
+<style>
+  /* 箭头旋转样式 */
+  .rotate-arrow {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .rotate-arrow.rotated {
+    transform: rotate(-90deg);
+  }
+  
+  /* 移动端二级菜单样式 */
+  @media (max-width: 639px) {
+    .group .absolute {
+      position: static;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      min-width: 0;
+      max-width: none;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+      overflow: visible;
+    }
+    
+    .group .absolute li {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    
+    .group .absolute li a {
+      padding: 0.75rem 1rem 0.75rem 2rem;
+      font-size: 0.875rem;
+      color: var(--color-foreground-muted);
+      line-height: 1.4;
+      background: transparent;
+      transition: color 0.2s;
+      display: block;
+      white-space: nowrap;
+    }
+    
+    .group .absolute li a:hover,
+    .group .absolute li a:focus {
+      color: var(--color-accent);
+      background: transparent;
+    }
+  }
+  
+  /* 无障碍访问支持 */
+  @media (prefers-reduced-motion: reduce) {
+    .transition-all {
+      transition: none;
+    }
+  }
+  
+  /* 键盘导航支持 */
+  .group:focus-within .absolute {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
 
 <script>
   function toggleNav() {
@@ -178,6 +282,46 @@ const isActive = (path: string) => {
       menuItems.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
+    });
+
+    // 二级菜单交互和箭头旋转 - 仅支持点击事件
+    const dropdownButtons = document.querySelectorAll('[aria-haspopup="true"]');
+    
+    dropdownButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        const submenu = button.nextElementSibling;
+        const arrowIcon = button.querySelector('.rotate-arrow');
+        
+        // 关闭其他打开的子菜单
+        dropdownButtons.forEach(otherBtn => {
+          if (otherBtn !== button) {
+            otherBtn.setAttribute('aria-expanded', 'false');
+            otherBtn.nextElementSibling?.classList.add('hidden');
+            const otherArrow = otherBtn.querySelector('.rotate-arrow');
+            if (otherArrow) otherArrow.classList.remove('rotated');
+          }
+        });
+        
+        button.setAttribute('aria-expanded', !isExpanded ? 'true' : 'false');
+        submenu?.classList.toggle('hidden');
+        
+        // 点击时旋转箭头（仅逆时针旋转90度）
+        if (arrowIcon) {
+          arrowIcon.classList.toggle('rotated', !isExpanded);
+        }
+      });
+    });
+
+    // 点击外部关闭菜单
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target instanceof Element && !e.target.closest('#nav-menu')) {
+        dropdownButtons.forEach(btn => {
+          btn.setAttribute('aria-expanded', 'false');
+          btn.nextElementSibling?.classList.add('hidden');
+        });
+      }
     });
   }
 
