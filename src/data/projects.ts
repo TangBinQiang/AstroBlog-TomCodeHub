@@ -40,7 +40,7 @@ export const projects: Project[] = [
     demoUrl: 'https://tasks.example.com',
     status: 'in-progress',
     featured: true,
-    date: '2024-11-15'
+    date: '2024-11-16'
   },
   {
     id: '3',
