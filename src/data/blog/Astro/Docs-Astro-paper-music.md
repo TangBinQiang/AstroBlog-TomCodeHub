@@ -1,0 +1,837 @@
+---
+author: tang binqiang
+pubDatetime: 2025-09-11T00:00:00Z
+modDatetime: 2025-09-11T00:00:00Z
+title: Docs-Astro-paper-music
+slug:  Docs-Astro-paper-music
+featured: false
+draft: false
+tags:
+  - docs
+  - astro
+description: 如何给Astro博客添加音乐胶囊
+---
+
+本文章介绍如何给Astro博客添加音乐胶囊
+
+## Table of contents
+
+## 1、新建名为`Music.astro`的文件
+``` astro
+---
+---
+import { musics, defaultMusic } from "@/data/musics";
+
+const formatDuration = (seconds: number | undefined) => {
+  if (!seconds) return "0:00";
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+---
+
+<div id="music-capsule" class="music-capsule" transition:persist>
+  <div class="music-mini" id="music-mini">
+    <div class="music-cover">
+      <img id="mini-cover" src={defaultMusic.cover} alt={defaultMusic.title} />
+      <div class="music-play-btn" id="mini-play-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="music-info">
+      <div class="music-title" id="mini-title">{defaultMusic.title}</div>
+      <div class="music-artist" id="mini-artist">{defaultMusic.artist}</div>
+    </div>
+  </div>
+
+  <div class="music-expanded" id="music-expanded">
+    <div class="music-header">
+      <div class="music-cover-large">
+        <img id="expanded-cover" src={defaultMusic.cover} alt={defaultMusic.title} />
+      </div>
+      <div class="music-details">
+        <h3 id="expanded-title">{defaultMusic.title}</h3>
+        <p id="expanded-artist">{defaultMusic.artist}</p>
+      </div>
+      <button class="close-btn" id="close-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="music-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="time-info">
+        <span id="current-time">0:00</span>
+        <span id="total-time">{formatDuration(defaultMusic.duration)}</span>
+      </div>
+    </div>
+
+    <div class="music-controls">
+      <button class="control-btn" id="prev-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+        </svg>
+      </button>
+      <button class="control-btn play-btn" id="play-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <button class="control-btn" id="next-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="music-list">
+      {musics.map((music) => (
+        <div class="music-item" data-music-id={music.id}>
+          <div class="item-cover">
+            <img src={music.cover} alt={music.title} />
+          </div>
+          <div class="item-info">
+            <div class="item-title">{music.title}</div>
+            <div class="item-artist">{music.artist}</div>
+          </div>
+          <div class="item-duration">{formatDuration(music.duration)}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .music-capsule {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+
+  .music-mini {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    min-width: 200px;
+  }
+
+  .music-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .music-cover {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .music-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  /* 移除旋转动画 */
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .music-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .music-cover:hover .music-play-btn {
+    opacity: 1;
+  }
+
+  .music-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .music-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-artist {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-expanded {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 320px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .music-expanded.active {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .music-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .music-cover-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .music-cover-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .music-cover-large.playing img {
+    animation: none;
+  }
+
+  .music-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .music-details h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-details p {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--color-muted);
+    transition: color 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .close-btn:hover {
+    color: var(--color-accent);
+  }
+
+  .music-progress {
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--color-muted);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .time-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .control-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem;
+    cursor: pointer;
+    color: var(--color-muted);
+    transition: all 0.3s ease;
+    border-radius: 50%;
+  }
+
+  .control-btn:hover {
+    background: var(--color-border);
+    color: var(--color-accent);
+  }
+
+  .play-btn {
+    background: var(--color-accent);
+    color: var(--color-background);
+    width: 48px;
+    height: 48px;
+  }
+
+  .play-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+
+  .music-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .music-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .music-item:hover {
+    background: var(--color-muted);
+  }
+
+  .music-item.active {
+    background: var(--color-accent);
+    color: var(--color-background);
+  }
+
+  .music-item.active .item-artist,
+  .music-item.active .item-duration {
+    color: var(--color-background);
+    opacity: 0.8;
+  }
+
+  .item-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .item-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .item-cover.playing img {
+    animation: none;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-artist,
+  .item-duration {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-duration {
+    font-size: 0.75rem;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .music-capsule {
+      bottom: 1rem;
+      right: 1rem;
+    }
+
+    .music-mini {
+      min-width: 160px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .music-expanded {
+      width: 280px;
+      right: -1rem;
+      bottom: -1rem;
+    }
+  }
+
+  :global(.dark) .music-mini {
+    background: rgba(17, 24, 39, 0.95);
+    border-color: rgba(75, 85, 99, 0.3);
+  }
+
+  :global(.dark) .music-expanded {
+    background: rgba(17, 24, 39, 0.98);
+    border-color: rgba(75, 85, 99, 0.3);
+  }
+
+  :global(.dark) .music-title,
+  :global(.dark) .music-details h3 {
+    color: #f9fafb;
+  }
+
+  :global(.dark) .music-artist,
+  :global(.dark) .music-details p {
+    color: #d1d5db;
+  }
+
+  :global(.dark) .control-btn,
+  :global(.dark) .close-btn {
+    color: #d1d5db;
+  }
+
+  :global(.dark) .control-btn:hover,
+  :global(.dark) .close-btn:hover {
+    background: rgba(55, 65, 81, 0.5);
+    color: #f9fafb;
+  }
+
+  :global(.dark) .music-item:hover {
+    background: rgba(55, 65, 81, 0.3);
+  }
+</style>
+
+<script is:inline define:vars={{ musics: musics, defaultMusic: defaultMusic }}>
+// 创建全局音乐播放器实例，确保在页面跳转时保持状态
+let musicPlayer = null;
+
+class MusicPlayer {
+  constructor() {
+    // 检查是否已有全局实例
+    if (window.globalMusicPlayer) {
+      return window.globalMusicPlayer;
+    }
+    
+    this.audio = new Audio();
+    this.currentMusicIndex = 0;
+    this.isPlaying = false;
+    this.isExpanded = false;
+    
+    // 使用通过define:vars传入的音乐数据
+    this.musics = musics;
+    
+    // 恢复之前的状态
+    this.restoreState();
+    this.init();
+    
+    // 设置为全局实例
+    window.globalMusicPlayer = this;
+  }
+
+  restoreState() {
+    // 从sessionStorage恢复状态
+    const savedState = sessionStorage.getItem('musicPlayerState');
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      this.currentMusicIndex = state.currentMusicIndex || 0;
+      this.isPlaying = state.isPlaying || false;
+      this.isExpanded = state.isExpanded || false;
+      if (state.currentTime) {
+        this.audio.currentTime = state.currentTime;
+      }
+    }
+  }
+
+  saveState() {
+    // 保存状态到sessionStorage
+    const state = {
+      currentMusicIndex: this.currentMusicIndex,
+      isPlaying: this.isPlaying,
+      isExpanded: this.isExpanded,
+      currentTime: this.audio.currentTime
+    };
+    sessionStorage.setItem('musicPlayerState', JSON.stringify(state));
+  }
+
+  init() {
+    this.setupEventListeners();
+    this.loadMusic(this.currentMusicIndex);
+    
+    // 如果之前是播放状态，继续播放
+    if (this.isPlaying) {
+      this.audio.play().catch(() => {
+        this.isPlaying = false;
+        this.updatePlayButton();
+      });
+    }
+    
+    // 设置展开状态
+    if (this.isExpanded) {
+      setTimeout(() => {
+        const musicExpanded = document.getElementById('music-expanded');
+        if (musicExpanded) {
+          musicExpanded.classList.add('active');
+        }
+      }, 100);
+    }
+  }
+
+  setupEventListeners() {
+    // 使用事件委托处理动态元素
+    document.addEventListener('click', (e) => {
+      const musicMini = e.target.closest('#music-mini') || e.target.closest('.music-mini');
+      const closeBtn = e.target.closest('#close-btn') || e.target.closest('.close-btn');
+      const playBtn = e.target.closest('#play-btn') || e.target.closest('.play-btn');
+      const prevBtn = e.target.closest('#prev-btn') || e.target.closest('.prev-btn');
+      const nextBtn = e.target.closest('#next-btn') || e.target.closest('.next-btn');
+      const miniPlayBtn = e.target.closest('#mini-play-btn') || e.target.closest('.mini-play-btn');
+      const musicItem = e.target.closest('.music-item');
+
+      if (musicMini && !miniPlayBtn) {
+        this.toggleExpanded();
+      } else if (closeBtn) {
+        this.toggleExpanded();
+      } else if (playBtn) {
+        this.togglePlay();
+      } else if (miniPlayBtn) {
+        e.stopPropagation();
+        this.togglePlay();
+      } else if (prevBtn) {
+        this.previous();
+      } else if (nextBtn) {
+        this.next();
+      } else if (musicItem) {
+        const index = Array.from(document.querySelectorAll('.music-item')).indexOf(musicItem);
+        if (index !== -1) {
+          this.loadMusic(index);
+        }
+      }
+    });
+
+    // 进度条点击事件
+    document.addEventListener('click', (e) => {
+      const progressBar = e.target.closest('.progress-bar');
+      if (progressBar) {
+        const rect = progressBar.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        this.audio.currentTime = percent * this.audio.duration;
+      }
+    });
+
+    this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+    this.audio.addEventListener('timeupdate', () => {
+      this.updateProgress();
+      this.saveState();
+    });
+    this.audio.addEventListener('ended', () => this.next());
+    this.audio.addEventListener('play', () => {
+      this.isPlaying = true;
+      this.updatePlayButton();
+      this.saveState();
+    });
+    this.audio.addEventListener('pause', () => {
+      this.isPlaying = false;
+      this.updatePlayButton();
+      this.saveState();
+    });
+
+    // 监听页面可见性变化
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        // 页面重新可见时，重新绑定事件
+        this.updateUI(this.musics[this.currentMusicIndex]);
+        this.updatePlayButton();
+      }
+    });
+
+    // 监听Astro的页面切换事件
+    document.addEventListener('astro:after-swap', () => {
+      // 页面切换后重新初始化UI
+      setTimeout(() => {
+        this.updateUI(this.musics[this.currentMusicIndex]);
+        this.updatePlayButton();
+        if (this.isExpanded) {
+          const musicExpanded = document.getElementById('music-expanded');
+          if (musicExpanded) {
+            musicExpanded.classList.add('active');
+          }
+        }
+      }, 100);
+    });
+  }
+
+  loadMusic(index) {
+    if (index < 0 || index >= this.musics.length) return;
+
+    this.currentMusicIndex = index;
+    const music = this.musics[index];
+    
+    this.audio.src = music.url;
+    this.updateUI(music);
+    
+    // 更新活动状态
+    const items = document.querySelectorAll('.music-item');
+    items.forEach((item, i) => {
+      item.classList.toggle('active', i === index);
+    });
+
+    if (this.isPlaying) {
+      this.audio.play().catch(console.error);
+    }
+    
+    this.saveState();
+  }
+
+  updateUI(music) {
+    // 安全地更新UI元素，处理可能不存在的元素
+    const miniCover = document.getElementById('mini-cover');
+    const miniTitle = document.getElementById('mini-title');
+    const miniArtist = document.getElementById('mini-artist');
+    const expandedCover = document.getElementById('expanded-cover');
+    const expandedTitle = document.getElementById('expanded-title');
+    const expandedArtist = document.getElementById('expanded-artist');
+    const totalTime = document.getElementById('total-time');
+
+    if (miniCover) miniCover.src = music.cover;
+    if (miniTitle) miniTitle.textContent = music.title;
+    if (miniArtist) miniArtist.textContent = music.artist;
+    if (expandedCover) expandedCover.src = music.cover;
+    if (expandedTitle) expandedTitle.textContent = music.title;
+    if (expandedArtist) expandedArtist.textContent = music.artist;
+    if (totalTime) totalTime.textContent = this.formatTime(music.duration || 0);
+  }
+
+
+
+  togglePlay() {
+    if (this.isPlaying) {
+      this.audio.pause();
+    } else {
+      this.audio.play().catch(() => {
+        // 自动播放被阻止，重置状态
+        this.isPlaying = false;
+        this.updatePlayButton();
+      });
+    }
+    this.isPlaying = !this.isPlaying;
+    this.updatePlayButton();
+    this.saveState();
+  }
+
+  updatePlayButton() {
+    const playBtn = document.getElementById('play-btn');
+    const miniPlayBtn = document.getElementById('mini-play-btn');
+    const miniCover = document.querySelector('.music-cover');
+    const expandedCover = document.querySelector('.music-cover-large');
+    const currentItemCover = document.querySelector('.music-item.active .item-cover');
+    
+    const icon = this.isPlaying 
+      ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+      : '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    
+    if (playBtn) playBtn.innerHTML = icon;
+    if (miniPlayBtn) {
+      miniPlayBtn.innerHTML = this.isPlaying 
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    }
+    
+    // 移除所有旋转动画控制
+  }
+
+  toggleExpanded() {
+    this.isExpanded = !this.isExpanded;
+    const musicExpanded = document.getElementById('music-expanded');
+    if (musicExpanded) {
+      musicExpanded.classList.toggle('active', this.isExpanded);
+    }
+    this.saveState();
+  }
+
+  previous() {
+    const newIndex = this.currentMusicIndex - 1;
+    this.loadMusic(newIndex < 0 ? this.musics.length - 1 : newIndex);
+  }
+
+  next() {
+    const newIndex = this.currentMusicIndex + 1;
+    this.loadMusic(newIndex >= this.musics.length ? 0 : newIndex);
+  }
+
+  updateProgress() {
+    const progress = (this.audio.currentTime / this.audio.duration) * 100;
+    const progressFill = document.getElementById('progress-fill');
+    const currentTime = document.getElementById('current-time');
+    
+    if (progressFill && currentTime && !isNaN(progress)) {
+      progressFill.style.width = `${progress}%`;
+      currentTime.textContent = this.formatTime(this.audio.currentTime);
+    }
+  }
+
+  updateDuration() {
+    const totalTime = document.getElementById('total-time');
+    if (totalTime && !isNaN(this.audio.duration)) {
+      totalTime.textContent = this.formatTime(this.audio.duration);
+    }
+  }
+
+  formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+}
+
+// 初始化播放器
+if (typeof window !== 'undefined') {
+  // 确保在Astro页面切换后重新初始化
+  function initMusicPlayer() {
+    if (!window.globalMusicPlayer) {
+      window.globalMusicPlayer = new MusicPlayer();
+    } else {
+      // 重新绑定事件和更新UI
+      window.globalMusicPlayer.updateUI(window.globalMusicPlayer.musics[window.globalMusicPlayer.currentMusicIndex]);
+      window.globalMusicPlayer.updatePlayButton();
+    }
+  }
+
+  // 立即初始化
+  initMusicPlayer();
+  
+  // 监听Astro页面切换
+  document.addEventListener('astro:after-swap', () => {
+    setTimeout(initMusicPlayer, 100);
+  });
+}
+</script>
+```
+
+## 2、新建musics.ts数据文件
+
+``` ts
+export interface Music {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  cover: string;
+  themeColor: string;
+  duration?: number;
+}
+
+export const musics: Music[] = [
+  {
+    id: '1',
+    title: '夜空中最亮的星',
+    artist: '逃跑计划',
+    url: 'https://music.163.com/song/media/outer/url?id=5238992',
+    cover: 'https://p2.music.126.net/diGAyEmpymX8G7JcnElncQ==/109951163699673355.jpg',
+    themeColor: '#1e3a8a',
+    duration: 252
+  },
+  {
+    id: '2',
+    title: '成都',
+    artist: '赵雷',
+    url: 'https://music.163.com/song/media/outer/url?id=436514354',
+    cover: 'https://p1.music.126.net/L-7tS-3YBuh558I8OYbA3g==/6667438510890774.jpg?param=90y90',
+    themeColor: '#059669',
+    duration: 328
+  },
+  {
+    id: '3',
+    title: '告白气球',
+    artist: '周杰伦',
+    url: 'https://music.163.com/song/media/outer/url?id=418603133',
+    cover: 'https://p1.music.126.net/L-7tS-3YBuh558I8OYbA3g==/6667438510890774.jpg?param=90y90',
+    themeColor: '#dc2626',
+    duration: 215
+  },
+];
+
+export const defaultMusic = musics[0];
+```
