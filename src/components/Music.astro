@@ -52,21 +52,29 @@ const formatDuration = (seconds: number | undefined) => {
     </div>
 
     <div class="music-controls">
-      <button class="control-btn" id="prev-btn">
+      <button class="control-btn" id="prev-btn" title="上一首 (←)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
         </svg>
       </button>
-      <button class="control-btn play-btn" id="play-btn">
+      <button class="control-btn play-btn" id="play-btn" title="播放/暂停 (空格)">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M8 5v14l11-7z"/>
         </svg>
       </button>
-      <button class="control-btn" id="next-btn">
+      <button class="control-btn" id="next-btn" title="下一首 (→)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
         </svg>
       </button>
+    </div>
+    <div class="volume-control">
+      <button class="control-btn" id="volume-btn" title="静音/取消静音 (M)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+      </button>
+      <input type="range" id="volume-slider" min="0" max="100" value="50" class="volume-slider" title="音量">
     </div>
 
     <div class="music-list">
@@ -82,6 +90,10 @@ const formatDuration = (seconds: number | undefined) => {
           <div class="item-duration">{formatDuration(music.duration)}</div>
         </div>
       ))}
+    </div>
+    
+    <div class="keyboard-shortcuts">
+      <small>快捷键: 空格=播放/暂停 ←=上一首 →=下一首 M=静音 ESC=关闭</small>
     </div>
   </div>
 </div>
@@ -300,7 +312,42 @@ const formatDuration = (seconds: number | undefined) => {
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .volume-slider {
+    flex: 1;
+    height: 4px;
+    background: var(--color-muted);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
   }
 
   .control-btn {
@@ -409,6 +456,20 @@ const formatDuration = (seconds: number | undefined) => {
     flex-shrink: 0;
   }
 
+  .keyboard-shortcuts {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: var(--color-muted);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .keyboard-shortcuts small {
+    font-size: 0.75rem;
+    color: var(--color-muted-foreground);
+    line-height: 1.4;
+  }
+
   @media (max-width: 640px) {
     .music-capsule {
       bottom: 1rem;
@@ -478,6 +539,15 @@ class MusicPlayer {
     this.currentMusicIndex = 0;
     this.isPlaying = false;
     this.isExpanded = false;
+    this.volume = 0.5;
+    this.isMuted = false;
+    
+    // 事件监听器引用，用于清理
+    this.clickHandler = null;
+    this.progressHandler = null;
+    this.keyHandler = null;
+    this.visibilityHandler = null;
+    this.audioEventsBound = false;
     
     // 使用通过define:vars传入的音乐数据
     this.musics = musics;
@@ -498,9 +568,12 @@ class MusicPlayer {
       this.currentMusicIndex = state.currentMusicIndex || 0;
       this.isPlaying = state.isPlaying || false;
       this.isExpanded = state.isExpanded || false;
+      this.volume = state.volume || 0.5;
+      this.isMuted = state.isMuted || false;
       if (state.currentTime) {
         this.audio.currentTime = state.currentTime;
       }
+      this.audio.volume = this.isMuted ? 0 : this.volume;
     }
   }
 
@@ -510,7 +583,9 @@ class MusicPlayer {
       currentMusicIndex: this.currentMusicIndex,
       isPlaying: this.isPlaying,
       isExpanded: this.isExpanded,
-      currentTime: this.audio.currentTime
+      currentTime: this.audio.currentTime,
+      volume: this.volume,
+      isMuted: this.isMuted
     };
     sessionStorage.setItem('musicPlayerState', JSON.stringify(state));
   }
@@ -518,6 +593,10 @@ class MusicPlayer {
   init() {
     this.setupEventListeners();
     this.loadMusic(this.currentMusicIndex);
+    this.updateVolumeButton();
+    
+    // 设置音量
+    this.audio.volume = this.isMuted ? 0 : this.volume;
     
     // 如果之前是播放状态，继续播放
     if (this.isPlaying) {
@@ -539,14 +618,18 @@ class MusicPlayer {
   }
 
   setupEventListeners() {
-    // 使用事件委托处理动态元素
-    document.addEventListener('click', (e) => {
+    // 移除之前的事件监听器，防止重复绑定
+    this.removeEventListeners();
+    
+    // 使用事件委托处理动态元素 - 绑定到this以便后续移除
+    this.clickHandler = (e) => {
       const musicMini = e.target.closest('#music-mini') || e.target.closest('.music-mini');
       const closeBtn = e.target.closest('#close-btn') || e.target.closest('.close-btn');
       const playBtn = e.target.closest('#play-btn') || e.target.closest('.play-btn');
       const prevBtn = e.target.closest('#prev-btn') || e.target.closest('.prev-btn');
       const nextBtn = e.target.closest('#next-btn') || e.target.closest('.next-btn');
       const miniPlayBtn = e.target.closest('#mini-play-btn') || e.target.closest('.mini-play-btn');
+      const volumeBtn = e.target.closest('#volume-btn') || e.target.closest('.volume-btn');
       const musicItem = e.target.closest('.music-item');
 
       if (musicMini && !miniPlayBtn) {
@@ -562,49 +645,122 @@ class MusicPlayer {
         this.previous();
       } else if (nextBtn) {
         this.next();
+      } else if (volumeBtn) {
+        this.toggleMute();
       } else if (musicItem) {
         const index = Array.from(document.querySelectorAll('.music-item')).indexOf(musicItem);
         if (index !== -1) {
           this.loadMusic(index);
         }
       }
-    });
-
+    };
+    
     // 进度条点击事件
-    document.addEventListener('click', (e) => {
+    this.progressHandler = (e) => {
       const progressBar = e.target.closest('.progress-bar');
       if (progressBar) {
         const rect = progressBar.getBoundingClientRect();
         const percent = (e.clientX - rect.left) / rect.width;
         this.audio.currentTime = percent * this.audio.duration;
       }
-    });
+    };
 
-    this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
-    this.audio.addEventListener('timeupdate', () => {
-      this.updateProgress();
-      this.saveState();
-    });
-    this.audio.addEventListener('ended', () => this.next());
-    this.audio.addEventListener('play', () => {
-      this.isPlaying = true;
-      this.updatePlayButton();
-      this.saveState();
-    });
-    this.audio.addEventListener('pause', () => {
-      this.isPlaying = false;
-      this.updatePlayButton();
-      this.saveState();
-    });
+    // 绑定事件监听器
+    document.addEventListener('click', this.clickHandler);
+    document.addEventListener('click', this.progressHandler);
 
-    // 监听页面可见性变化
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        // 页面重新可见时，重新绑定事件
-        this.updateUI(this.musics[this.currentMusicIndex]);
+    // 音频事件 - 这些只需要绑定一次
+    if (!this.audioEventsBound) {
+      this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+      this.audio.addEventListener('timeupdate', () => {
+        this.updateProgress();
+        this.saveState();
+      });
+      this.audio.addEventListener('ended', () => this.next());
+      this.audio.addEventListener('error', (e) => {
+        console.error('音乐加载失败:', e);
+        setTimeout(() => this.next(), 2000);
+      });
+      this.audio.addEventListener('play', () => {
+        this.isPlaying = true;
         this.updatePlayButton();
+        this.saveState();
+      });
+      this.audio.addEventListener('pause', () => {
+        this.isPlaying = false;
+        this.updatePlayButton();
+        this.saveState();
+      });
+      this.audioEventsBound = true;
+    }
+
+    // 音量控制
+    const volumeSlider = document.getElementById('volume-slider');
+    if (volumeSlider) {
+      volumeSlider.addEventListener('input', (e) => {
+        this.volume = parseInt(e.target.value) / 100;
+        this.audio.volume = this.volume;
+        this.isMuted = false;
+        this.updateVolumeButton();
+        this.saveState();
+      });
+      volumeSlider.value = this.volume * 100;
+    }
+
+    // 键盘快捷键
+    this.keyHandler = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      switch(e.code) {
+        case 'Space':
+          e.preventDefault();
+          this.togglePlay();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          this.previous();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          this.next();
+          break;
+        case 'KeyM':
+          e.preventDefault();
+          this.toggleMute();
+          break;
+        case 'Escape':
+          if (this.isExpanded) {
+            this.toggleExpanded();
+          }
+          break;
       }
-    });
+    };
+    document.addEventListener('keydown', this.keyHandler);
+
+    // 页面可见性变化 - 这个也只需要绑定一次
+    if (!this.visibilityHandler) {
+      this.visibilityHandler = () => {
+        if (document.visibilityState === 'visible') {
+          this.updateUI(this.musics[this.currentMusicIndex]);
+          this.updatePlayButton();
+        }
+      };
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+    }
+  }
+
+  removeEventListeners() {
+    // 移除之前绑定的事件监听器
+    if (this.clickHandler) {
+      document.removeEventListener('click', this.clickHandler);
+    }
+    if (this.progressHandler) {
+      document.removeEventListener('click', this.progressHandler);
+    }
+    if (this.keyHandler) {
+      document.removeEventListener('keydown', this.keyHandler);
+    }
+    // 注意：音频事件和visibilitychange事件不需要移除，因为Audio对象保持存在
 
     // 监听Astro的页面切换事件
     document.addEventListener('astro:after-swap', () => {
@@ -628,7 +784,16 @@ class MusicPlayer {
     this.currentMusicIndex = index;
     const music = this.musics[index];
     
-    this.audio.src = music.url;
+    // 只在URL改变时重新设置src，避免不必要的重新加载
+    if (this.audio.src !== music.url) {
+      this.audio.src = music.url;
+      
+      // 如果之前正在播放，继续播放新音乐
+      if (this.isPlaying) {
+        this.audio.play().catch(console.error);
+      }
+    }
+    
     this.updateUI(music);
     
     // 更新活动状态
@@ -636,10 +801,6 @@ class MusicPlayer {
     items.forEach((item, i) => {
       item.classList.toggle('active', i === index);
     });
-
-    if (this.isPlaying) {
-      this.audio.play().catch(console.error);
-    }
     
     this.saveState();
   }
@@ -738,6 +899,29 @@ class MusicPlayer {
     }
   }
 
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    this.audio.volume = this.isMuted ? 0 : this.volume;
+    this.updateVolumeButton();
+    this.saveState();
+  }
+
+  updateVolumeButton() {
+    const volumeBtn = document.getElementById('volume-btn');
+    const volumeSlider = document.getElementById('volume-slider');
+    
+    if (volumeBtn) {
+      const icon = this.isMuted || this.volume === 0
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+      volumeBtn.innerHTML = icon;
+    }
+    
+    if (volumeSlider) {
+      volumeSlider.value = this.volume * 100;
+    }
+  }
+
   formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -752,18 +936,34 @@ if (typeof window !== 'undefined') {
     if (!window.globalMusicPlayer) {
       window.globalMusicPlayer = new MusicPlayer();
     } else {
-      // 重新绑定事件和更新UI
-      window.globalMusicPlayer.updateUI(window.globalMusicPlayer.musics[window.globalMusicPlayer.currentMusicIndex]);
-      window.globalMusicPlayer.updatePlayButton();
+      // 重新绑定事件和更新UI，但不重新创建Audio对象
+      const player = window.globalMusicPlayer;
+      
+      // 重新获取DOM元素引用
+      player.setupEventListeners();
+      
+      // 更新UI，保持音频播放状态
+      player.updateUI(player.musics[player.currentMusicIndex]);
+      player.updatePlayButton();
+      player.updateVolumeButton();
+      player.updateProgress();
+      
+      // 更新进度条和时长
+      if (player.audio.duration) {
+        player.updateDuration();
+      }
     }
   }
 
   // 立即初始化
   initMusicPlayer();
   
-  // 监听Astro页面切换
+  // 监听Astro页面切换 - 使用更快的重新初始化
   document.addEventListener('astro:after-swap', () => {
-    setTimeout(initMusicPlayer, 100);
+    // 使用requestAnimationFrame确保DOM已更新
+    requestAnimationFrame(() => {
+      initMusicPlayer();
+    });
   });
 }
 </script>
