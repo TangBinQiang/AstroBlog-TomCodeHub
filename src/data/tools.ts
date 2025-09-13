@@ -26,6 +26,7 @@ import icons8 from '../assets/icons/tools/icons8.svg'
 import react from '../assets/icons/tools/dev/react.svg'
 import vue from '../assets/icons/tools/dev/Vue.svg'
 import IT工具 from '../assets/icons/tools/IT工具.svg'
+import GitHub from '../assets/icons/tools/dev/代码托管平台/GitHub.svg'
 
 export interface Tool {
   name: string;
@@ -93,7 +94,7 @@ export const toolCategories: ToolCategory[] = [
         icon: LMArena,
         name: "LMArena",
         description: "Google开发集成多种AI大型模型（免注册，多种主流大模型集成，使用体验极好）。",
-        url: "https://chatgpt.com/",
+        url: "https://lmarena.ai/",
         recommended: true,
       },
       {
@@ -170,7 +171,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     title: "编程",
-    subCategories: ["前端开发", "后端开发", "数据库","其它"],
+    subCategories: ["前端开发", "后端开发", "数据库", "代码托管平台","其它"],
     tools: [
       {
         icon: vue,
@@ -226,6 +227,15 @@ export const toolCategories: ToolCategory[] = [
         category: "编程",
         subCategory: "数据库",
       },
+      {
+        icon: GitHub,
+        name: "GitHub",
+        description: "强大的开源代码托管平台",
+        url: "https://github.com/",
+        recommended: true,
+        category: "编程",
+        subCategory: "代码托管平台",
+      },
     ],
   },
   // 添加第二个"编程"分类来测试大类隔离
@@ -266,6 +276,39 @@ export const toolCategories: ToolCategory[] = [
   {
     title: "编程",
     subCategories: ["开发环境", "代码质量", "性能优化"],
+    tools: [
+      {
+        icon: null,
+        name: "VS Code",
+        category: "编程",
+        subCategory: "开发环境",
+        description: "微软开发的代码编辑器",
+        url: "https://code.visualstudio.com/",
+        recommended: true,
+      },
+      {
+        icon: null,
+        name: "ESLint",
+        description: "JavaScript代码检查工具",
+        url: "https://eslint.org/",
+        recommended: false,
+        category: "编程",
+        subCategory: "代码质量",
+      },
+      {
+        icon: null,
+        name: "Webpack",
+        description: "现代JavaScript应用程序的静态模块打包工具",
+        url: "https://webpack.js.org/",
+        recommended: false,
+        category: "编程",
+        subCategory: "性能优化",
+      },
+    ],
+  },
+  {
+    title: "摸鱼",
+    // subCategories: ["开发环境", "代码质量", "性能优化"],
     tools: [
       {
         icon: null,
