@@ -95,10 +95,10 @@ const isActive = (path: string) => {
           </li>
           <!-- 资源库大集 - 包含开源库和工具集的父菜单项 -->
           <li class="col-span-2 relative group">
-            <!-- 父菜单项 -->
-            <a href="#" class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1 cursor-pointer">
-              资源库大集
-            </a>
+            <!-- 父菜单项 - 改为纯文本标签 -->
+            <span class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1 cursor-pointer">
+              资源大合集
+            </span>
             
             <!-- 主容器，包含子菜单和连接线 -->
             <div class="absolute left-0 right-0 top-full z-50">
@@ -111,8 +111,8 @@ const isActive = (path: string) => {
                 <div class="w-4 h-4 bg-background border border-border/60 border-b-0 border-r-0 transform rotate-45 translate-y-[-50%] shadow-md opacity-0 invisible transition-all duration-200 ease-out group-hover:opacity-100 group-hover:visible z-10"></div>
               </div>
               
-              <!-- 子菜单容器 - 添加边框增强层次感 -->
-              <ul class="absolute left-0 right-0 mx-auto w-48 origin-top scale-95 bg-background border border-border/60 shadow-lg rounded-lg overflow-hidden opacity-0 invisible transition-all duration-250 ease-out group-hover:opacity-100 group-hover:visible group-hover:scale-100 sm:w-auto sm:translate-x-0 sm:ml-0">
+              <!-- 子菜单容器 - 调整为自适应宽度确保文字横向显示 -->
+              <ul class="absolute left-1/2 transform -translate-x-1/2 origin-top scale-95 bg-background border border-border/60 shadow-lg rounded-lg overflow-hidden opacity-0 invisible transition-all duration-250 ease-out group-hover:opacity-100 group-hover:visible group-hover:scale-100 whitespace-nowrap">
                 <!-- 菜单项 - 简约风格设计 -->
                 <li>
                   <a href="/open-source" class="block px-5 py-3 text-center font-medium hover:text-accent hover:bg-background/70 transition-all duration-150" class:list={{ "active-nav": isActive("/open-source") }}>
