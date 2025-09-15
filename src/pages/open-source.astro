@@ -1,0 +1,920 @@
+---
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+import { openSourceProjects } from "../data/open-source";
+
+// 格式化数字（K, M等）
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k';
+  }
+  return num.toString();
+}
+
+// 格式化日期
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 1) return '昨天';
+  if (diffDays < 7) return `${diffDays}天前`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}个月前`;
+  return `${Math.floor(diffDays / 365)}年前`;
+}
+---
+
+<Layout title={`开源项目推荐 | ${SITE.title}`}>
+  <Header activeNav="open-source" />
+  <Main pageTitle="开源项目推荐" pageDesc="精选优质开源项目，助力开发者成长">
+    
+    <!-- 搜索功能 -->
+    <section class="mb-8 -mx-4">
+      <div class="max-w-md mx-auto">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="search-input"
+            placeholder="搜索开源项目..."
+            autocomplete="off"
+            spellcheck="false"
+            autocorrect="off"
+            autocapitalize="off"
+            class="w-full px-4 py-3 pl-10 pr-4 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+          />
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <button 
+            id="clear-search"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors hidden"
+            title="清除搜索"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div id="search-results-info" class="text-center mt-2 text-sm text-muted-foreground hidden">
+          <span id="results-count">0</span> 个项目匹配
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- 项目网格 -->
+    <section class="-mx-4">
+      <div id="project-grid" class="project-grid grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {openSourceProjects.map((project) => (
+          <div class="project-card" data-name={project.name.toLowerCase()} data-description={project.description.toLowerCase()} data-topics={project.topics.join(' ').toLowerCase()} data-owner={project.owner.toLowerCase()}>
+            <div class="project-header">
+              <div class="project-icon">
+                <img 
+                  src={project.ownerAvatar} 
+                  alt={project.owner}
+                  class="w-10 h-10 rounded-full"
+                />
+              </div>
+              <div class="project-info">
+                <h3 class="project-name">
+                  <a 
+                    href={project.githubUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="hover:text-primary transition-colors"
+                  >
+                    {project.name}
+                  </a>
+                </h3>
+                <p class="project-owner">{project.owner}</p>
+              </div>
+              
+              <div class="project-stats-top">
+                <div class="stat-item" title="星标数">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span>{formatNumber(project.stars)}</span>
+                </div>
+                
+                <div class="stat-item" title="Fork数">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  <span>{formatNumber(project.forks)}</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="project-description">
+              {project.description}
+            </p>
+
+            <div class="project-topics">
+              {project.topics.slice(0, 4).map((topic) => (
+                <span class="topic-tag">{topic}</span>
+              ))}
+            </div>
+
+            <div class="language-progress-container">
+              <div class="language-progress-bar">
+                {project.languages.map((lang) => (
+                  <div 
+                    class="language-progress-segment"
+                    style={`width: ${lang.percentage}%; background-color: ${lang.color}`}
+                    title={`${lang.name}: ${lang.percentage}%`}
+                  ></div>
+                ))}
+              </div>
+              <div class="language-labels">
+                {project.languages.map((lang) => (
+                  <div class="language-label">
+                    <div class="language-color" style={`background-color: ${lang.color}`}></div>
+                    <span class="language-name">{lang.name}</span>
+                    <span class="language-percentage">{lang.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div class="project-actions">
+              <a 
+                href={project.githubUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="action-btn github-btn"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>查看仓库</span>
+              </a>
+              {project.websiteUrl && (
+                <a 
+                  href={project.websiteUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="action-btn website-btn"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                  <span>访问官网</span>
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <!-- 分页导航 -->
+      <div id="pagination" class="pagination-container mt-8 flex justify-center items-center gap-4">
+        <button 
+          id="prev-page" 
+          class="pagination-btn prev-btn"
+          disabled
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          上一页
+        </button>
+        
+        <div id="page-info" class="page-info">
+          <span id="current-page">1</span> / <span id="total-pages">1</span>
+        </div>
+        
+        <button 
+          id="next-page" 
+          class="pagination-btn next-btn"
+          disabled
+        >
+          下一页
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 页脚说明 -->
+    <section class="mt-16">
+      <div class="text-center">
+        <p class="text-sm text-muted-foreground">
+          项目数据来源于 GitHub API，定期更新。如有建议，欢迎通过
+          <a href="/about" class="text-primary hover:underline">关于页面</a>
+          联系我。
+        </p>
+      </div>
+    </section>
+
+  </Main>
+  <Footer />
+</Layout>
+
+<script is:inline>
+  // 配置常量
+  const ITEMS_PER_PAGE = 4;
+  let currentPage = 1;
+  let filteredProjects = [];
+  let allProjects = [];
+
+  // DOM元素 - 使用let以便在init()函数中重新赋值
+  let searchInput = document.getElementById('search-input');
+  let clearButton = document.getElementById('clear-search');
+  let resultsInfo = document.getElementById('search-results-info');
+  let resultsCount = document.getElementById('results-count');
+  let prevBtn = document.getElementById('prev-page');
+  let nextBtn = document.getElementById('next-page');
+  let currentPageSpan = document.getElementById('current-page');
+  let totalPagesSpan = document.getElementById('total-pages');
+
+  // 初始化项目数据
+  function initProjects() {
+    const projectCards = document.querySelectorAll('.project-card');
+    allProjects = Array.from(projectCards);
+    filteredProjects = [...allProjects];
+  }
+
+  // 搜索功能
+  function performSearch() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (searchTerm) {
+      filteredProjects = allProjects.filter(project => {
+        const name = project.dataset.name || '';
+        const description = project.dataset.description || '';
+        const topics = project.dataset.topics || '';
+        const owner = project.dataset.owner || '';
+        
+        return name.includes(searchTerm) || 
+               description.includes(searchTerm) || 
+               topics.includes(searchTerm) ||
+               owner.includes(searchTerm);
+      });
+      resultsInfo.classList.remove('hidden');
+      resultsCount.textContent = filteredProjects.length;
+    } else {
+      filteredProjects = [...allProjects];
+      resultsInfo.classList.add('hidden');
+    }
+    
+    currentPage = 1;
+    renderPage();
+    updatePagination();
+    
+    // 应用高亮显示
+    applyHighlights();
+  }
+  
+  // 应用搜索内容高亮显示
+  function applyHighlights() {
+    const searchTerm = searchInput.value.trim();
+    
+    // 先移除所有之前的高亮
+    removeHighlights();
+    
+    if (!searchTerm) return;
+    
+    // 为当前显示的项目应用高亮
+    const currentProjects = filteredProjects.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE, 
+      currentPage * ITEMS_PER_PAGE
+    );
+    
+    currentProjects.forEach(project => {
+      // 高亮项目名称
+      const nameElement = project.querySelector('.project-name a');
+      if (nameElement) {
+        nameElement.innerHTML = highlightText(nameElement.textContent, searchTerm);
+      }
+      
+      // 高亮项目描述
+      const descriptionElement = project.querySelector('.project-description');
+      if (descriptionElement) {
+        descriptionElement.innerHTML = highlightText(descriptionElement.textContent, searchTerm);
+      }
+      
+      // 高亮主题标签中的匹配关键词
+      const topicElements = project.querySelectorAll('.topic-tag');
+      topicElements.forEach(topic => {
+        if (topic.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+          topic.innerHTML = highlightText(topic.textContent, searchTerm);
+        }
+      });
+      
+      // 高亮所有者名称
+      const ownerElement = project.querySelector('.project-owner');
+      if (ownerElement) {
+        ownerElement.innerHTML = highlightText(ownerElement.textContent, searchTerm);
+      }
+    });
+  }
+  
+  // 高亮文本中的搜索词
+  function highlightText(text, searchTerm) {
+    if (!searchTerm || !text) return text;
+    
+    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+  }
+  
+  // 转义正则表达式特殊字符
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& 表示整个匹配的字符串
+  }
+  
+  // 移除所有高亮显示
+  function removeHighlights() {
+    // 移除所有高亮标记
+    const highlightElements = document.querySelectorAll('.search-highlight');
+    highlightElements.forEach(element => {
+      const parent = element.parentNode;
+      parent.replaceChild(document.createTextNode(element.textContent), element);
+      parent.normalize();
+    });
+  }
+
+  // 清除搜索
+  function clearSearch() {
+    searchInput.value = '';
+    performSearch();
+    searchInput.focus();
+  }
+
+  // 渲染当前页面
+  function renderPage() {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    // 隐藏所有项目
+    allProjects.forEach(project => {
+      project.style.display = 'none';
+    });
+
+    // 显示当前页面的项目
+    const currentProjects = filteredProjects.slice(startIndex, endIndex);
+    currentProjects.forEach(project => {
+      project.style.display = 'block';
+    });
+
+    // 处理无结果情况
+    const noResults = document.getElementById('no-results');
+    if (currentProjects.length === 0) {
+      if (!noResults) {
+        const noResultsDiv = document.createElement('div');
+        noResultsDiv.id = 'no-results';
+        noResultsDiv.className = 'text-center py-12';
+        noResultsDiv.style.gridColumn = '1 / -1';
+        noResultsDiv.innerHTML = `
+          <svg class="mx-auto h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-foreground">未找到相关项目</h3>
+          <p class="mt-1 text-sm text-muted-foreground">
+            ${searchInput.value.trim() ? `没有找到与 "${searchInput.value.trim()}" 相关的开源项目` : '暂无项目数据'}
+          </p>
+        `;
+        document.getElementById('project-grid').appendChild(noResultsDiv);
+      }
+      document.getElementById('no-results').style.display = 'block';
+    } else {
+      const existingNoResults = document.getElementById('no-results');
+      if (existingNoResults) {
+        existingNoResults.style.display = 'none';
+      }
+    }
+  }
+
+  // 更新分页信息
+  function updatePagination() {
+    const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+    
+    currentPageSpan.textContent = currentPage;
+    totalPagesSpan.textContent = totalPages;
+    
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+  }
+
+  // 分页事件处理
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage();
+      updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      applyHighlights(); // 分页后重新应用高亮
+    }
+  });
+  
+  nextBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderPage();
+      updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      applyHighlights(); // 分页后重新应用高亮
+    }
+  });
+
+  // 搜索事件处理已移至init()函数内部
+  // 键盘快捷键事件已移至init()函数内部
+
+  // 初始化函数 - 每次都重新绑定事件监听器
+  function init() {
+    // 重新获取DOM元素引用
+    searchInput = document.getElementById('search-input');
+    clearButton = document.getElementById('clear-search');
+    resultsInfo = document.getElementById('search-results-info');
+    resultsCount = document.getElementById('results-count');
+    prevBtn = document.getElementById('prev-page');
+    nextBtn = document.getElementById('next-page');
+    currentPageSpan = document.getElementById('current-page');
+    totalPagesSpan = document.getElementById('total-pages');
+    
+    // 清除旧的事件监听器（通过克隆元素实现）
+    const newSearchInput = searchInput.cloneNode(true);
+    const newClearButton = clearButton.cloneNode(true);
+    const newPrevBtn = prevBtn.cloneNode(true);
+    const newNextBtn = nextBtn.cloneNode(true);
+    
+    // 替换原始元素以清除所有事件监听器
+    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    clearButton.parentNode.replaceChild(newClearButton, clearButton);
+    prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+    nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+    
+    // 更新引用到新元素
+    searchInput = newSearchInput;
+    clearButton = newClearButton;
+    prevBtn = newPrevBtn;
+    nextBtn = newNextBtn;
+    
+    // 重新初始化数据
+    initProjects();
+    currentPage = 1;
+    
+    // 从sessionStorage恢复搜索状态
+    const savedSearch = sessionStorage.getItem('openSourceSearch');
+    if (savedSearch) {
+      searchInput.value = savedSearch;
+    }
+    
+    renderPage();
+    updatePagination();
+    
+    // 如果有搜索词，应用高亮
+    if (searchInput.value.trim()) {
+      performSearch();
+    }
+    
+    // 重新绑定事件监听器
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPage();
+        updatePagination();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPage();
+        updatePagination();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    
+    searchInput.addEventListener('input', performSearch);
+    clearButton.addEventListener('click', clearSearch);
+    
+    // 键盘快捷键
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        clearSearch();
+      }
+    });
+    
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.trim()) {
+        clearButton.classList.remove('hidden');
+      } else {
+        clearButton.classList.add('hidden');
+      }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+  }
+
+  // 确保DOM加载完成后初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // 处理Astro视图转换
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:after-swap', init);
+  document.addEventListener('astro:before-swap', () => {
+    // 页面切换前保存当前搜索状态
+    sessionStorage.setItem('openSourceSearch', searchInput.value || '');
+    sessionStorage.setItem('openSourcePage', currentPage.toString());
+  });
+</script>
+
+<style>
+  /* 项目卡片样式 */
+  .project-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* 项目头部 */
+  .project-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin-bottom: 0.625rem;
+    position: relative;
+  }
+
+  /* 右上角统计图标 */
+  .project-stats-top {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .project-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+  }
+
+  .project-name a:hover {
+    color: var(--color-accent);
+  }
+
+  .project-owner {
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+  }
+
+  /* 项目描述 */
+  .project-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-muted-foreground);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* 主题标签 */
+  .project-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 1rem;
+  }
+
+  .topic-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+    opacity: 0.6;
+    font-size: 0.75rem;
+    border-radius: 0.375rem;
+  }
+
+  /* 项目统计 */
+  .project-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .language-progress-container {
+    margin-bottom: 1rem;
+  }
+
+  .language-progress-bar {
+    display: flex;
+    height: 0.5rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background-color: var(--color-border);
+    margin-bottom: 0.75rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .language-progress-segment {
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .language-progress-segment:hover {
+    filter: brightness(1.1);
+  }
+
+  .language-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .language-label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    cursor: default;
+  }
+
+  .language-color {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .language-name {
+    color: var(--color-foreground);
+    font-weight: 500;
+  }
+
+  .language-percentage {
+    color: var(--color-muted-foreground);
+    font-weight: 600;
+    margin-left: 0.125rem;
+  }
+
+  /* 操作按钮 */
+  .project-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: color 0.2s ease;
+    text-decoration: none;
+  }
+
+  .github-btn {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  .github-btn:hover {
+    background-color: var(--color-foreground);
+    opacity: 0.9;
+  }
+
+  .website-btn {
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
+  }
+
+  .action-btn:hover {
+    background-color: var(--color-muted);
+  }
+
+  /* 搜索高亮样式 */
+  .search-highlight {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.125rem;
+    font-weight: 600;
+  }
+
+  /* 搜索输入框样式 */
+  #search-input {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
+  }
+
+  #search-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb), 0.1);
+  }
+
+  #search-input::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  /* 无结果提示样式 */
+  #no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 0;
+  }
+
+  /* 分页样式 */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    color: var(--color-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    background-color: var(--color-muted);
+    border-color: var(--color-accent);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--color-muted);
+    border-color: var(--color-border);
+  }
+
+  .page-info {
+    padding: 0.5rem 1rem;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+    font-weight: 500;
+  }
+  
+  /* 搜索高亮样式 */
+  .search-highlight {
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+  
+  /* 主题标签内关键词高亮样式（黄色高亮） */
+  .topic-tag .search-highlight {
+    background-color: #ffeb3b; /* 黄色背景 */
+    color: #000000; /* 黑色文字 */
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+  }
+
+  /* 调整卡片内字体大小 */
+  .project-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  
+  .project-owner {
+    font-size: 0.875rem;
+  }
+  
+  .project-description {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  
+  /* 调整图标大小 */
+  .stat-item svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* 响应式设计 */
+  @media (max-width: 1024px) {
+    .project-stats {
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+      column-gap: 1rem;
+    }
+    
+    .project-actions {
+      flex-direction: column;
+    }
+
+    .action-btn {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    section {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .project-card {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-actions {
+      flex-direction: column;
+    }
+
+    .action-btn {
+      justify-content: center;
+    }
+    
+    .project-stats-top {
+      gap: 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    .language-progress-bar {
+      height: 0.375rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .language-labels {
+      gap: 0.5rem;
+      font-size: 0.6875rem;
+    }
+    
+    .language-color {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
+  }
+</style>
