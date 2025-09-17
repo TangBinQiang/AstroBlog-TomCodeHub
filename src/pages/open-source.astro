@@ -193,22 +193,7 @@ function formatDate(dateString: string): string {
           <span id="current-page">1</span> / <span id="total-pages">1</span>
         </div>
         
-        <!-- 页码跳转输入框 -->
-        <div class="page-jump-container flex items-center gap-2">
-          <input 
-            type="number" 
-            id="page-jump-input"
-            min="1" 
-            placeholder="页码"
-            class="w-20 px-2 py-1.5 bg-card border border-border rounded-md text-center text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-          />
-          <button 
-            id="page-jump-btn"
-            class="pagination-btn px-3 py-1.5 text-sm"
-          >
-            跳转
-          </button>
-        </div>
+
         
         <button 
           id="next-page" 
@@ -254,8 +239,7 @@ function formatDate(dateString: string): string {
   let nextBtn = document.getElementById('next-page');
   let currentPageSpan = document.getElementById('current-page');
   let totalPagesSpan = document.getElementById('total-pages');
-  let pageJumpInput = document.getElementById('page-jump-input');
-  let pageJumpBtn = document.getElementById('page-jump-btn');
+
 
   // 初始化项目数据
   function initProjects() {
@@ -467,38 +451,24 @@ function formatDate(dateString: string): string {
     const newClearButton = clearButton.cloneNode(true);
     const newPrevBtn = prevBtn.cloneNode(true);
     const newNextBtn = nextBtn.cloneNode(true);
-    const newPageJumpInput = pageJumpInput?.cloneNode(true) || document.getElementById('page-jump-input')?.cloneNode(true);
-    const newPageJumpBtn = pageJumpBtn?.cloneNode(true) || document.getElementById('page-jump-btn')?.cloneNode(true);
     
     // 替换原始元素以清除所有事件监听器
     searchInput.parentNode.replaceChild(newSearchInput, searchInput);
     clearButton.parentNode.replaceChild(newClearButton, clearButton);
     prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
     nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
-    if (pageJumpInput && newPageJumpInput) pageJumpInput.parentNode.replaceChild(newPageJumpInput, pageJumpInput);
-    if (pageJumpBtn && newPageJumpBtn) pageJumpBtn.parentNode.replaceChild(newPageJumpBtn, pageJumpBtn);
     
     // 更新引用到新元素
     searchInput = newSearchInput;
     clearButton = newClearButton;
     prevBtn = newPrevBtn;
     nextBtn = newNextBtn;
-    pageJumpInput = newPageJumpInput || document.getElementById('page-jump-input');
-    pageJumpBtn = newPageJumpBtn || document.getElementById('page-jump-btn');
     
     // 重新初始化数据
     initProjects();
-    // 从sessionStorage恢复页码
-    const savedPage = sessionStorage.getItem('openSourcePage');
-    if (savedPage) {
-      const pageNum = parseInt(savedPage, 10);
-      if (!isNaN(pageNum) && pageNum > 0) {
-        const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
-        currentPage = Math.min(pageNum, totalPages);
-      }
-    } else {
-      currentPage = 1;
-    }
+    
+    // 重置当前页码
+    currentPage = 1;
     
     // 从sessionStorage恢复搜索状态
     const savedSearch = sessionStorage.getItem('openSourceSearch');
@@ -506,12 +476,14 @@ function formatDate(dateString: string): string {
       searchInput.value = savedSearch;
     }
     
-    renderPage();
-    updatePagination();
-    
-    // 如果有搜索词，应用高亮
+    // 执行搜索以确保filteredProjects正确初始化
     if (searchInput.value.trim()) {
       performSearch();
+    } else {
+      // 如果没有搜索词，确保显示所有项目
+      filteredProjects = [...allProjects];
+      renderPage();
+      updatePagination();
     }
     
     // 重新绑定事件监听器
@@ -533,42 +505,6 @@ function formatDate(dateString: string): string {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
-    
-    // 页面跳转功能
-    pageJumpBtn.addEventListener('click', jumpToPage);
-    
-    // 页码输入框按回车键也可以跳转
-    pageJumpInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        jumpToPage();
-      }
-    });
-    
-    // 跳转到指定页面的函数
-    function jumpToPage() {
-      const pageNum = parseInt(pageJumpInput.value.trim(), 10);
-      const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
-      
-      // 验证页码是否有效
-      if (!isNaN(pageNum) && pageNum > 0 && pageNum <= totalPages) {
-        currentPage = pageNum;
-        renderPage();
-        updatePagination();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        // 清空输入框
-        pageJumpInput.value = '';
-      } else if (pageNum > totalPages) {
-        // 如果页码超出总页数，则跳转到最后一页
-        currentPage = totalPages;
-        renderPage();
-        updatePagination();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        pageJumpInput.value = '';
-      } else {
-        // 无效页码，清空输入框
-        pageJumpInput.value = '';
-      }
-    }
     
     searchInput.addEventListener('input', performSearch);
     clearButton.addEventListener('click', clearSearch);
@@ -607,9 +543,8 @@ function formatDate(dateString: string): string {
   document.addEventListener('astro:page-load', init);
   document.addEventListener('astro:after-swap', init);
   document.addEventListener('astro:before-swap', () => {
-    // 页面切换前保存当前搜索状态
+    // 页面切换前只保存搜索状态，不保存页码
     sessionStorage.setItem('openSourceSearch', searchInput.value || '');
-    sessionStorage.setItem('openSourcePage', currentPage.toString());
   });
 </script>
 
