@@ -726,18 +726,33 @@ function formatDate(dateString: string): string {
     color: var(--color-background);
   }
 
-  .github-btn:hover {
+  /* GitHub按钮 - 添加悬停动效 */
+  .github-btn {
     background-color: var(--color-foreground);
-    opacity: 0.9;
+    color: var(--color-background);
+    transition: all 0.2s ease;
   }
 
+  .github-btn:hover {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 官网按钮 - 添加悬停动效 */
   .website-btn {
     border: 1px solid var(--color-border);
     color: var(--color-foreground);
+    background-color: transparent;
+    transition: all 0.2s ease;
   }
 
-  .action-btn:hover {
-    background-color: var(--color-muted);
+  .website-btn:hover {
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   /* 搜索高亮样式 */
