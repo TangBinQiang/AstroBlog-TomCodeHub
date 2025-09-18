@@ -224,8 +224,8 @@ function formatDate(dateString: string): string {
 </Layout>
 
 <script is:inline>
-  // 配置常量
-  const ITEMS_PER_PAGE = 4;
+  // 配置常量 - 修改为每页显示2个项目
+  const ITEMS_PER_PAGE = 2;
   let currentPage = 1;
   let filteredProjects = [];
   let allProjects = [];
@@ -493,6 +493,7 @@ function formatDate(dateString: string): string {
         renderPage();
         updatePagination();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        applyHighlights(); // 分页后重新应用高亮
       }
     });
     
@@ -503,6 +504,7 @@ function formatDate(dateString: string): string {
         renderPage();
         updatePagination();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        applyHighlights(); // 分页后重新应用高亮
       }
     });
     
