@@ -11,6 +11,7 @@ tags:
 description:
   How you can enable/disable light & dark mode; and customize color schemes
   of AstroPaper theme.
+ogImage: "https://picsum.photos/seed/color/800/450"
 ---
 
 This post will explain how you can enable/disable light & dark mode for the website. Moreover, you'll learn how you can customize color schemes of the entire website.

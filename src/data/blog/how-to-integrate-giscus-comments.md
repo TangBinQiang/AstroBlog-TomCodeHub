@@ -11,6 +11,7 @@ tags:
   - blog
   - docs
 description: Comment function on a static blog hosted on GitHub Pages with Giscus.
+ogImage: "https://picsum.photos/seed/comments/800/450"
 ---
 
 Hosting a thin static blog on a platform like [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site) has numerous advantages, but also takes away some interactivity. Fortunately, [Giscus](https://giscus.app/) exists and offers a way to embed user comments on static sites.

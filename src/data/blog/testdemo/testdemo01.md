@@ -10,6 +10,7 @@ tags:
   - docs
   - test
 description: 测试博客
+ogImage: "https://picsum.photos/seed/test/800/450"
 ---
 
 AstroPaper is a highly customizable Astro blog theme. With AstroPaper, you can customize everything according to your personal taste. This article will explain how you can make some customizations easily in the config file.

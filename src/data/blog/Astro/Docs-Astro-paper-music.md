@@ -10,6 +10,7 @@ tags:
   - docs
   - astro
 description: 如何给Astro博客添加音乐胶囊
+ogImage: "https://picsum.photos/seed/music/800/450"
 ---
 
 本文章介绍如何给Astro博客添加音乐胶囊

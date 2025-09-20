@@ -10,6 +10,7 @@ tags:
   - FAQ
 canonicalURL: https://smale.codes/posts/setting-dates-via-git-hooks/
 description: How to use Git Hooks to set your Created and Modified Dates on AstroPaper
+ogImage: "https://picsum.photos/seed/git-hooks/800/450"
 ---
 
 In this post I will explain how to use the pre-commit Git hook to automate the input of the created (`pubDatetime`) and modified (`modDatetime`) in the AstroPaper blog theme frontmatter

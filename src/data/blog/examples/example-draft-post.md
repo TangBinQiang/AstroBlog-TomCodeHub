@@ -12,6 +12,7 @@ description:
   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
   incididunt ut labore et dolore magna aliqua. Praesent elementum facilisis leo vel
   fringilla est
+ogImage: "https://picsum.photos/seed/example/800/450"
 ---
 
 Users cannot see this post because it is in draft.

@@ -10,7 +10,7 @@ export interface Props extends CollectionEntry<"blog"> {
 
 const { variant = "h2", data, id, filePath } = Astro.props;
 
-const { title, description, pubDatetime, modDatetime, timezone } = data;
+const { title, description, pubDatetime, modDatetime, timezone, ogImage } = data;
 
 const headerProps = {
   style: { viewTransitionName: slugifyStr(title) },
@@ -19,18 +19,32 @@ const headerProps = {
 ---
 
 <li class="my-6">
-  <a
-    href={getPath(id, filePath)}
-    class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
-  >
-    {
-      variant === "h2" ? (
-        <h2 {...headerProps}>{title}</h2>
-      ) : (
-        <h3 {...headerProps}>{title}</h3>
-      )
-    }
-  </a>
-  <Datetime {pubDatetime} {modDatetime} {timezone} />
-  <p>{description}</p>
+  <div class="flex flex-col md:flex-row items-start gap-4">
+    <div class="flex-1">
+      <a
+        href={getPath(id, filePath)}
+        class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
+      >
+        {
+          variant === "h2" ? (
+            <h2 {...headerProps}>{title}</h2>
+          ) : (
+            <h3 {...headerProps}>{title}</h3>
+          )
+        }
+      </a>
+      <Datetime {pubDatetime} {modDatetime} {timezone} />
+      <p>{description}</p>
+    </div>
+    {ogImage && (
+        <div class="w-full md:w-45 h-45 md:h-30 flex-shrink-0 rounded-md overflow-hidden shadow-md ">
+        <img 
+            src={typeof ogImage === 'string' ? ogImage : ogImage.src} 
+            alt={title} 
+            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+            loading="lazy"
+          />
+      </div>
+    )}
+  </div>
 </li>

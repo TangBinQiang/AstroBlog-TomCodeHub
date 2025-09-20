@@ -6,6 +6,7 @@ title: How to add LaTeX Equations in Astro blog posts
 tags:
   - docs
 description: Learn how to add LaTeX equations in Astro blog posts using Markdown, KaTeX, and remark/rehype plugins.
+ogImage: "https://picsum.photos/seed/latex/800/450"
 ---
 
 This document demonstrates how to use LaTeX equations in your Markdown files for AstroPaper. LaTeX is a powerful typesetting system often used for mathematical and scientific documents.

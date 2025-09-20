@@ -9,6 +9,7 @@ draft: false
 tags:
   - docs
 description: 创建Astro项目，应用Astro-paper主题
+ogImage: "https://picsum.photos/seed/vitepress/800/450"
 ---
 
 
