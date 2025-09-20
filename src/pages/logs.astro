@@ -1,0 +1,54 @@
+---
+// @ts-nocheck
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+import { logs } from "@/data/logs";
+import Datetime from "@/components/Datetime.astro";
+---
+
+<Layout title={`日志更新 | ${SITE.title}`}>
+  <Header activeNav="logs" />
+  <Main 
+    pageTitle="系统日志" 
+    pageDesc="记录博客的每次更新、升级与优化内容"
+  >
+    <div class="space-y-8">
+      {logs.map((log) => (
+        <div 
+          key={log.id} 
+          class="rounded-lg border border-border bg-card p-6 transition-all hover:shadow-md"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="text-xl font-bold text-accent">{log.title}</div>
+              {log.version && (
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                  {log.version}
+                </span>
+              )}
+            </div>
+            <Datetime pubDatetime={new Date(log.date)} size="sm" />
+          </div>
+          
+          <p class="mb-4 text-foreground/80">{log.description}</p>
+          
+          <div class="mt-4">
+            <h3 class="text-sm font-medium text-foreground/70 mb-2">更新内容:</h3>
+            <ul class="space-y-1.5">
+              {log.changes.map((change, index) => (
+                <li key={index} class="flex items-start gap-2">
+                  <span class="inline-block mt-1.5 h-1.5 w-1.5 rounded-full bg-accent flex-shrink-0"></span>
+                  <span class="text-sm text-foreground/90">{change}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Main>
+  <Footer />
+</Layout>
