@@ -27,6 +27,7 @@ import react from '../assets/icons/tools/dev/react.svg'
 import vue from '../assets/icons/tools/dev/Vue.svg'
 import IT工具 from '../assets/icons/tools/IT工具.svg'
 import GitHub from '../assets/icons/tools/dev/代码托管平台/GitHub.svg'
+import ShadcnVue from '../assets/icons/tools/dev/UI组件库/shadcn-vue.svg'
 
 export interface Tool {
   name: string;
@@ -171,7 +172,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     title: "编程",
-    subCategories: ["前端开发", "后端开发", "数据库", "代码托管平台","其它"],
+    subCategories: ["前端开发", "UI组件库","后端开发", "数据库", "代码托管平台","其它"],
     tools: [
       {
         icon: vue,
@@ -197,7 +198,7 @@ export const toolCategories: ToolCategory[] = [
         category: "编程",
         subCategory: "其它",
         description: "在线代码编辑器（支持多种语言）",
-        url: "https://www.codecogs.com/lab/online.php",
+        url: "https://it-tools.tech/",
         recommended: false,
       },
       {
@@ -235,6 +236,15 @@ export const toolCategories: ToolCategory[] = [
         recommended: true,
         category: "编程",
         subCategory: "代码托管平台",
+      },
+      {
+        icon: ShadcnVue,
+        name: "ShadcnVue",
+        description: "Vue后台管理页面UI组件库",
+        url: "https://shadcn-vue.cndocs.org/",
+        recommended: true,
+        category: "编程",
+        subCategory: "UI组件库",
       },
     ],
   },
@@ -274,7 +284,7 @@ export const toolCategories: ToolCategory[] = [
   },
   // 添加第三个"编程"分类，使用不同的子类别名称来进一步测试
   {
-    title: "编程",
+    title: "编程001",
     subCategories: ["开发环境", "代码质量", "性能优化"],
     tools: [
       {
