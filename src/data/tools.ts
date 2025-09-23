@@ -28,6 +28,11 @@ import vue from '../assets/icons/tools/dev/Vue.svg'
 import IT工具 from '../assets/icons/tools/IT工具.svg'
 import GitHub from '../assets/icons/tools/dev/代码托管平台/GitHub.svg'
 import ShadcnVue from '../assets/icons/tools/dev/UI组件库/shadcn-vue.svg'
+import 学 from '../assets/icons/tools/dev/教程/学.svg'
+import MDN from '../assets/icons/tools/dev/教程/mdn.svg'
+
+//设计
+import Figma from '../assets/icons/tools/design/figma.svg'
 
 export interface Tool {
   name: string;
@@ -172,7 +177,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     title: "编程",
-    subCategories: ["前端开发", "UI组件库","后端开发", "数据库", "代码托管平台","其它"],
+    subCategories: ["前端开发", "UI组件库","后端开发", "数据库", "代码托管平台", "教程","其它"],
     tools: [
       {
         icon: vue,
@@ -246,21 +251,67 @@ export const toolCategories: ToolCategory[] = [
         category: "编程",
         subCategory: "UI组件库",
       },
+      // 教程
+      {
+        icon: MDN,
+        name: "MDN Web Docs",
+        description: "全网最佳的前端开发教程和文档",
+        url: "https://developer.mozilla.org/zh-CN/",
+        recommended: false,
+        category: "编程",
+        subCategory: "教程",
+      },
+       {
+        icon: 学,
+        name: "lanmper学编程",
+        description: "详细的编程知识库（前端，数据库）",
+        url: "https://www.lanmper.cn/",
+        recommended: false,
+        category: "编程",
+        subCategory: "教程",
+      },
     ],
   },
-  // 添加第二个"编程"分类来测试大类隔离
+  // 添加第二个"设计"分类，使用不同的子类别名称来测试
   {
     title: "设计",
-    subCategories: ["测试工具", "部署工具", "监控工具"],
+    subCategories: ["UI设计", "原型设计", "用户体验"],
     tools: [
+      {
+        icon: Figma,
+        name: "Figma",
+        description: "在线协作设计工具",
+        url: "https://www.figma.com/",
+        recommended: false,
+        category: "设计",
+        subCategory: "UI设计",
+      },
+      {
+        icon: null,
+        name: "Sketch",
+        description: "数字设计工具",
+        url: "https://www.sketch.com/",
+        recommended: false,
+        category: "设计",
+        subCategory: "UI设计",
+      },
+      {
+        icon: null,
+        name: "Adobe XD",
+        description: "用户体验设计工具",
+        url: "https://www.adobe.com/products/xd.html",
+        recommended: false,
+        category: "设计",
+        subCategory: "UI设计",
+      },
       {
         icon: null,
         name: "Jest",
-        category: "编程",
-        subCategory: "测试工具",
         description: "JavaScript测试框架",
         url: "https://jestjs.io/",
         recommended: false,
+        category: "编程",
+        subCategory: "测试工具",
       },
       {
         icon: null,
